@@ -5,7 +5,7 @@
 #![no_std]
 
 elrond_wasm_node::wasm_endpoints! {
-    nft_minter
+    lynxee
     (
         callBack
         buyNft
