@@ -10,6 +10,8 @@ elrond_wasm_node::wasm_endpoints! {
         callBack
         buyNft
         createNft
+        getCurrentSupply
+        getJsonCid
         getNftPrice
         issueToken
         setLocalRoles

@@ -2,6 +2,7 @@ elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
 use elrond_wasm::elrond_codec::TopEncode;
+use elrond_wasm::types::BigUint;
 
 const NFT_AMOUNT: u32 = 1;
 const ROYALTIES_MAX: u32 = 10_000;
@@ -139,7 +140,7 @@ pub trait NftModule {
         match result {
             ManagedAsyncCallResult::Ok(token_id) => {
                 self.nft_token_id().set(&token_id);
-            },
+            }
             ManagedAsyncCallResult::Err(_) => {
                 let caller = self.blockchain().get_owner_address();
                 let (returned_tokens, token_id) = self.call_value().payment_token_pair();
@@ -147,7 +148,7 @@ pub trait NftModule {
                     self.send()
                         .direct(&caller, &token_id, 0, &returned_tokens, &[]);
                 }
-            },
+            }
         }
     }
 
@@ -222,4 +223,15 @@ pub trait NftModule {
 
     #[storage_mapper("priceTag")]
     fn price_tag(&self, nft_nonce: u64) -> SingleValueMapper<PriceTag<Self::Api>>;
+
+    #[view(getCurrentSupply)]
+    #[storage_mapper("currentSupply")]
+    fn current_supply(&self) -> SingleValueMapper<BigUint>;
+
+    #[storage_mapper("maxSupply")]
+    fn max_supply(&self) -> SingleValueMapper<BigUint>;
+
+    #[view(getJsonCid)]
+    #[storage_mapper("jsonCid")]
+    fn json_cid(&self) -> SingleValueMapper<ManagedBuffer>;
 }

@@ -13,7 +13,13 @@ pub struct ExampleAttributes {
 #[elrond_wasm::contract]
 pub trait NftMinter: nft_module::NftModule {
     #[init]
-    fn init(&self) {}
+    fn init(&self, max_supply: BigUint, json_cid: ManagedBuffer) -> SCResult<()> {
+        self.current_supply().set(&BigUint::zero());
+        self.max_supply().set(&max_supply);
+        self.json_cid().set(&json_cid);
+
+        Ok(())
+    }
 
     #[allow(clippy::too_many_arguments)]
     #[only_owner]

@@ -42,7 +42,10 @@
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../output/lynxee.wasm",
-                "arguments": [],
+                "arguments": [
+                    "3000",
+                    "str:cid"
+                ],
                 "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
@@ -60,7 +63,11 @@
                 "sc:nft-minter": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
+                    "storage": {
+                        "str:jsonCid": "str:cid",
+                        "str:maxSupply": "3000",
+                        "str:currentSupply": "0"
+                    },
                     "code": "file:../output/lynxee.wasm"
                 },
                 "+": ""
