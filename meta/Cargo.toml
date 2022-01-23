@@ -1,0 +1,17 @@
+[package]
+name = "lynxee-meta"
+version = "0.0.0"
+authors = [ "you",]
+edition = "2018"
+publish = false
+
+[dev-dependencies]
+
+[dependencies.lynxee]
+path = ".."
+
+[dependencies.elrond-wasm]
+version = "0.26.0"
+
+[dependencies.elrond-wasm-debug]
+version = "0.26.0"
