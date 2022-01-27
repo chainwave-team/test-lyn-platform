@@ -1,0 +1,111 @@
+{
+    "name": "mint nft",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "init.scen.json"
+        },
+        {
+            "step": "checkState",
+            "comment": "check before testing if the contract is ready to work",
+            "accounts": {
+                "sc:nft-minter": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:LYNX-123456": {
+                            "lastNonce": "0",
+                            "roles": [
+                                "ESDTRoleNFTCreate"
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:tokenId": "str:LYNX-123456",
+                        "str:tokenName": "str:Lynxee",
+                        "str:jsonCid": "str:bafybeia4lqhl7g7wdd65ye76rw2s25ladr7khixevqeyjnao6azpwkjr2m",
+                        "str:imageCid": "str:bafybeiejtr7dewbts7uqrffwso4c6pvpkceiqqwninpv3qqkizlaqzaftu",
+                        "str:royalties": "1000",
+                        "str:tags": "str:animal,lynx,art"
+                    },
+                    "owner": "address:owner",
+                    "code": "file:../output/lynxee.wasm"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "create-NFT-1",
+            "tx": {
+                "from": "address:buyer",
+                "to": "sc:nft-minter",
+                "function": "mint",
+                "arguments": [],
+                "egldValue": "200,000,000,000,000,000",
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:buyer": {
+                    "nonce": "1",
+                    "balance": "9,800,000,000,000,000,000",
+                    "esdt": {
+                        "str:LYNX-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "creator": "sc:nft-minter",
+                                    "royalties": "1000",
+                                    "uri": "str:ipfs://bafybeiejtr7dewbts7uqrffwso4c6pvpkceiqqwninpv3qqkizlaqzaftu/884.png",
+                                    "attributes": "str:metadata:bafybeia4lqhl7g7wdd65ye76rw2s25ladr7khixevqeyjnao6azpwkjr2m/884.json;tags:animal,lynx,art"
+                                }
+                            ],
+                            "lastNonce": "0"
+                        }
+                    }
+                },
+                "sc:nft-minter": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:tokenId": "str:LYNX-123456",
+                        "str:tokenName": "str:Lynxee",
+                        "str:mintedIds.node_links|u32:1": "u32:0|u32:0",
+                        "str:mintedIds.value|u32:1": "884",
+                        "str:mintedIds.node_id|u32:884": "1",
+                        "str:mintedIds.info": "u32:1|u32:1|u32:1|u32:1",
+                        "str:jsonCid": "str:bafybeia4lqhl7g7wdd65ye76rw2s25ladr7khixevqeyjnao6azpwkjr2m",
+                        "str:imageCid": "str:bafybeiejtr7dewbts7uqrffwso4c6pvpkceiqqwninpv3qqkizlaqzaftu",
+                        "str:royalties": "1000",
+                        "str:tags": "str:animal,lynx,art"
+                    },
+                    "owner": "address:owner",
+                    "code": "file:../output/lynxee.wasm",
+                    "esdt": {
+                        "str:LYNX-123456": {
+                            "lastNonce": "1",
+                            "roles": [
+                                "ESDTRoleNFTCreate"
+                            ]
+                        }
+                    }
+                },
+                "+": ""
+            }
+        }
+    ]
+}

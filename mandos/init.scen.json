@@ -1,5 +1,6 @@
 {
     "name": "init",
+    "comment": "deploy the smart-contract, then mock issue nft and set roles",
     "steps": [
         {
             "step": "setState",
@@ -10,22 +11,7 @@
                 },
                 "address:buyer": {
                     "nonce": "0",
-                    "balance": "1000",
-                    "esdt": {
-                        "str:FUNG-123456": "1000",
-                        "str:SEMIFUNG-123456": {
-                            "instances": [
-                                {
-                                    "nonce": "1",
-                                    "balance": "1000"
-                                },
-                                {
-                                    "nonce": "2",
-                                    "balance": "1000"
-                                }
-                            ]
-                        }
-                    }
+                    "balance": "10,000,000,000,000,000,000"
                 }
             },
             "newAddresses": [
@@ -43,8 +29,10 @@
                 "from": "address:owner",
                 "contractCode": "file:../output/lynxee.wasm",
                 "arguments": [
-                    "3000",
-                    "str:cid"
+                    "1000",
+                    "str:bafybeia4lqhl7g7wdd65ye76rw2s25ladr7khixevqeyjnao6azpwkjr2m",
+                    "str:bafybeiejtr7dewbts7uqrffwso4c6pvpkceiqqwninpv3qqkizlaqzaftu",
+                    "str:animal,lynx,art"
                 ],
                 "gasLimit": "10,000,000",
                 "gasPrice": "0"
@@ -64,9 +52,10 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:jsonCid": "str:cid",
-                        "str:maxSupply": "3000",
-                        "str:currentSupply": "0"
+                        "str:jsonCid": "str:bafybeia4lqhl7g7wdd65ye76rw2s25ladr7khixevqeyjnao6azpwkjr2m",
+                        "str:imageCid": "str:bafybeiejtr7dewbts7uqrffwso4c6pvpkceiqqwninpv3qqkizlaqzaftu",
+                        "str:royalties": "1000",
+                        "str:tags": "str:animal,lynx,art"
                     },
                     "code": "file:../output/lynxee.wasm"
                 },
@@ -75,12 +64,13 @@
         },
         {
             "step": "setState",
+            "comment": "set the token issued and the roles set",
             "accounts": {
                 "sc:nft-minter": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:NFT-123456": {
+                        "str:LYNX-123456": {
                             "lastNonce": "0",
                             "roles": [
                                 "ESDTRoleNFTCreate"
@@ -88,11 +78,44 @@
                         }
                     },
                     "storage": {
-                        "str:nftTokenId": "str:NFT-123456"
+                        "str:tokenId": "str:LYNX-123456",
+                        "str:tokenName": "str:Lynxee",
+                        "str:jsonCid": "str:bafybeia4lqhl7g7wdd65ye76rw2s25ladr7khixevqeyjnao6azpwkjr2m",
+                        "str:imageCid": "str:bafybeiejtr7dewbts7uqrffwso4c6pvpkceiqqwninpv3qqkizlaqzaftu",
+                        "str:royalties": "1000",
+                        "str:tags": "str:animal,lynx,art"
                     },
                     "code": "file:../output/lynxee.wasm",
                     "owner": "address:owner"
                 }
+            }
+        },
+        {
+            "step": "checkState",
+            "comment": "ready to work, used for the next steps",
+            "accounts": {
+                "sc:nft-minter": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:LYNX-123456": {
+                            "lastNonce": "0",
+                            "roles": [
+                                "ESDTRoleNFTCreate"
+                            ]
+                        }
+                    },
+                    "storage": {
+                        "str:tokenId": "str:LYNX-123456",
+                        "str:tokenName": "str:Lynxee",
+                        "str:jsonCid": "str:bafybeia4lqhl7g7wdd65ye76rw2s25ladr7khixevqeyjnao6azpwkjr2m",
+                        "str:imageCid": "str:bafybeiejtr7dewbts7uqrffwso4c6pvpkceiqqwninpv3qqkizlaqzaftu",
+                        "str:royalties": "1000",
+                        "str:tags": "str:animal,lynx,art"
+                    },
+                    "code": "file:../output/lynxee.wasm"
+                },
+                "+": ""
             }
         }
     ]

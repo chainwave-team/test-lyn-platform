@@ -8,12 +8,16 @@ elrond_wasm_node::wasm_endpoints! {
     lynxee
     (
         callBack
-        buyNft
-        createNft
-        getCurrentSupply
+        getImageCid
         getJsonCid
-        getNftPrice
+        getMintPrice
+        getTokenId
+        getTokenName
         issueToken
+        mint
+        pauseMinting
         setLocalRoles
+        setRoyalties
+        startMinting
     )
 }
