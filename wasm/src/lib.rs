@@ -13,6 +13,7 @@ elrond_wasm_node::wasm_endpoints! {
         getMintPrice
         getTokenId
         getTokenName
+        giveaway
         issueToken
         mint
         pauseMinting

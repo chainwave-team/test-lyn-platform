@@ -66,6 +66,7 @@ chmod +x ./bin/generate_api.sh
 
 - `issueToken()`
 - `setLocalRoles()`
+- `giveaway()`
 - `setRoyalties()`
 - `pauseMinting()`
 - `startMinting()`
@@ -87,6 +88,20 @@ chmod +x ./bin/generate_api.sh
 - `imageCid`
 - `tags`
 - `mintedIds`
-- `nextId`
+- `soldMintedIds`
 - `royalties`
 - `paused`
+
+## Supply distribution and mint process
+
+![repartition](./supply-repartition.png)
+
+We will reserve 300 NFTs
+
+- 6 auctions (selected)
+- 144 giveaway (including 2 for each team members (4)(selected)) (free)
+- 150 for the Duck friends (free)
+
+Then for the 2700 left item, the price will grow by mint count steps from 0.1 EGLD to 0.4 EGLD.
+
+Note: The 10 first NFT (4 for the team, 6 auctions)  from id 1 to 10 will be locked. Only the owner can mint and transfer it.
