@@ -55,7 +55,8 @@
                         "str:jsonCid": "str:bafybeia4lqhl7g7wdd65ye76rw2s25ladr7khixevqeyjnao6azpwkjr2m",
                         "str:imageCid": "str:bafybeiejtr7dewbts7uqrffwso4c6pvpkceiqqwninpv3qqkizlaqzaftu",
                         "str:royalties": "1000",
-                        "str:tags": "str:animal,lynx,art"
+                        "str:tags": "str:animal,lynx,art",
+                        "str:paused": ""
                     },
                     "code": "file:../output/lynxee.wasm"
                 },
@@ -63,8 +64,84 @@
             }
         },
         {
+            "step": "scCall",
+            "txId": "set-un-paused",
+            "comment": "activate minting journey by disabling paused boolean",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:nft-minter",
+                "egldValue": "0",
+                "function": "startMinting",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "comment": "is un-paused",
+            "accounts": {
+                "sc:nft-minter": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:paused": "",
+                        "+": ""
+                    },
+                    "code": "file:../output/lynxee.wasm",
+                    "owner": "address:owner"
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "txId": "set-paused",
+            "comment": "paused minting journey by enabling paused boolean",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:nft-minter",
+                "egldValue": "0",
+                "function": "pauseMinting",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "comment": "is un-paused",
+            "accounts": {
+                "sc:nft-minter": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:paused": "1",
+                        "+": ""
+                    },
+                    "code": "file:../output/lynxee.wasm",
+                    "owner": "address:owner"
+                },
+                "+": ""
+            }
+        },
+        {
             "step": "setState",
-            "comment": "set the token issued and the roles set",
+            "comment": "set the token issued and the roles set to be able to interact with the SC",
             "accounts": {
                 "sc:nft-minter": {
                     "nonce": "0",
@@ -83,7 +160,9 @@
                         "str:jsonCid": "str:bafybeia4lqhl7g7wdd65ye76rw2s25ladr7khixevqeyjnao6azpwkjr2m",
                         "str:imageCid": "str:bafybeiejtr7dewbts7uqrffwso4c6pvpkceiqqwninpv3qqkizlaqzaftu",
                         "str:royalties": "1000",
-                        "str:tags": "str:animal,lynx,art"
+                        "str:tags": "str:animal,lynx,art",
+                        "str:paused": "",
+                        "str:nextId": "245"
                     },
                     "code": "file:../output/lynxee.wasm",
                     "owner": "address:owner"
@@ -110,8 +189,12 @@
                         "str:tokenName": "str:Lynxee",
                         "str:jsonCid": "str:bafybeia4lqhl7g7wdd65ye76rw2s25ladr7khixevqeyjnao6azpwkjr2m",
                         "str:imageCid": "str:bafybeiejtr7dewbts7uqrffwso4c6pvpkceiqqwninpv3qqkizlaqzaftu",
+                        "str:tags": "str:animal,lynx,art",
+                        "str:mintedIds": "",
+                        "str:soldMintedIds": "",
                         "str:royalties": "1000",
-                        "str:tags": "str:animal,lynx,art"
+                        "str:paused": "",
+                        "str:nextId": "245"
                     },
                     "code": "file:../output/lynxee.wasm"
                 },
