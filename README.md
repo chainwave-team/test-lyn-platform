@@ -66,6 +66,7 @@ chmod +x ./bin/generate_api.sh
 
 - `issueToken()`
 - `setLocalRoles()`
+- `giveawayMany()`
 - `giveaway()`
 - `setRoyalties()`
 - `pauseMinting()`
@@ -75,6 +76,8 @@ chmod +x ./bin/generate_api.sh
 ### View
 
 - `getMintPrice()`
+- `getMintedCount()`
+- `getSoldCount()`
 - `getTokenId()`
 - `getTokenName()`
 - `getJsonCid()`
@@ -91,6 +94,7 @@ chmod +x ./bin/generate_api.sh
 - `soldMintedIds`
 - `royalties`
 - `paused`
+- `nextId`
 
 ## Supply distribution and mint process
 

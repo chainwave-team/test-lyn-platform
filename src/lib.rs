@@ -86,16 +86,36 @@ pub trait NftMinter {
             .async_call())
     }
 
+    /// Run multiple time "giveaway" methods to send many tokens
+    #[only_owner]
+    #[endpoint(giveawayMany)]
+    fn giveaway_many(&self, receiver: ManagedAddress, count: u32) -> SCResult<()> {
+        for _ in 0..count {
+            let next_id = self.next_id().get();
+            self.generate_random_next_id()?;
+            self.giveaway(&receiver, OptionalArg::Some(next_id))?;
+        }
+        Ok(())
+    }
+
     /// This function is the private version of mint, but here you have more control.
     #[only_owner]
     #[endpoint(giveaway)]
-    fn giveaway(&self, receiver: ManagedAddress, #[var_args] id: OptionalArg<u32>) -> SCResult<()> {
+    fn giveaway(
+        &self,
+        receiver: &ManagedAddress,
+        #[var_args] id: OptionalArg<u32>,
+    ) -> SCResult<()> {
         let id: u32 = match id {
             OptionalArg::Some(index) => {
                 self.require_token_id_available(&index)?;
                 index
             }
-            OptionalArg::None => self.build_random_id(),
+            OptionalArg::None => {
+                let next_id = self.next_id().get();
+                self.generate_random_next_id()?;
+                next_id
+            }
         };
 
         // Mint
@@ -152,7 +172,8 @@ pub trait NftMinter {
         self.require_there_is_enough_to_pay(&payment_amount)?;
 
         // Mint
-        let nft_nonce = self.create_nft(self.build_random_id())?;
+        let nft_nonce = self.create_nft(self.next_id().get())?;
+        self.generate_random_next_id()?;
 
         // Pay the mint cost
         self.send().direct(
@@ -194,6 +215,18 @@ pub trait NftMinter {
         };
 
         BigUint::from(mint_price)
+    }
+
+    // Convert to hex
+
+    #[view(getMintedCount)]
+    fn get_minted_count(&self) -> usize {
+        self.minted_ids().len()
+    }
+
+    #[view(getSoldCount)]
+    fn get_sold_count(&self) -> usize {
+        self.sold_minted_ids().len()
     }
 
     // callbacks
@@ -295,7 +328,7 @@ pub trait NftMinter {
     /// So, excepted for special ones, we'll mint them randomly to mint them randomly.
     /// This function generate randomly the next available id.
     // TODO: May be optimized by looking for the resting range instead whole range
-    fn build_random_id(&self) -> u32 {
+    fn generate_random_next_id(&self) -> SCResult<()> {
         // It starts at 11 because the ten firsts are reserved.
         const STARTING_INDEX: u32 = 11;
 
@@ -307,7 +340,8 @@ pub trait NftMinter {
             rand_index = rand_source.next_u32_in_range(STARTING_INDEX, MAX_SUPPLY);
         }
 
-        rand_index
+        self.next_id().set(rand_index);
+        Ok(())
     }
 
     fn str_to_buffer(&self, string: &str) -> ManagedBuffer {
@@ -411,4 +445,8 @@ pub trait NftMinter {
 
     #[storage_mapper("paused")]
     fn paused(&self) -> SingleValueMapper<bool>;
+
+    // We save the next id in a var to be able to mock it in unit tests
+    #[storage_mapper("nextId")]
+    fn next_id(&self) -> SingleValueMapper<u32>;
 }

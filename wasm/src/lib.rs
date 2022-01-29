@@ -11,9 +11,12 @@ elrond_wasm_node::wasm_endpoints! {
         getImageCid
         getJsonCid
         getMintPrice
+        getMintedCount
+        getSoldCount
         getTokenId
         getTokenName
         giveaway
+        giveawayMany
         issueToken
         mint
         pauseMinting
