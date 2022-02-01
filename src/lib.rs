@@ -5,10 +5,12 @@ extern crate alloc;
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-const NFT_AMOUNT: u32 = 1;
-const ROYALTIES_MAX: u32 = 10_000;
-const MAX_SUPPLY: u32 = 3000;
-const ON_SALE_SUPPLY: u32 = 2700;
+const NFT_AMOUNT: u64 = 1;
+const ROYALTIES_MAX: u64 = 10_000;
+// TODO: WARNING - FAKE DATA TO TEST
+const MAX_SUPPLY: u64 = 50; // 3000;
+                            // TODO: WARNING - FAKE DATA TO TEST
+const ON_SALE_SUPPLY: u64 = 40; // 2700;
 const ONE_EGLD: u64 = 1_000_000_000_000_000_000;
 const IMAGE_EXT: &str = ".png";
 const IPFS_SCHEME: &str = "ipfs://";
@@ -18,6 +20,10 @@ const ATTR_SEPARATOR: &str = ";";
 const URI_SLASH: &str = "/";
 const TAGS_KEY_NAME: &str = "tags:";
 
+// TODO: Pass it as function args (in init ideally)
+const IMAGE_CID: &str = "bafybeidfyg4tkxazcrih3eaocpwn4m67vyhcuocrujwple6yjolxktniqm";
+const JSON_CID: &str = "bafybeiewbfwy2c33zzrn6u57z6ymni4jixdscryj7jovyuiknsklfqb4n4";
+
 #[elrond_wasm::contract]
 pub trait NftMinter {
     // constructor called on deploy
@@ -25,14 +31,16 @@ pub trait NftMinter {
     fn init(
         &self,
         royalties: BigUint, // eg: 1000 (10%)
-        json_cid: ManagedBuffer,
-        image_cid: ManagedBuffer,
         tags: ManagedBuffer, // eg: animal,art
+                            // json_cid: ManagedBuffer,
+                            // image_cid: ManagedBuffer,
     ) -> SCResult<()> {
         self.set_royalties(royalties)?;
-        self.json_cid().set(&json_cid);
-        self.image_cid().set(&image_cid);
         self.tags().set(&tags);
+        self.json_cid().set(&self.str_to_buffer(JSON_CID));
+        self.image_cid().set(&self.str_to_buffer(IMAGE_CID));
+        // self.json_cid().set(&json_cid);
+        // self.image_cid().set(&image_cid);
 
         Ok(())
     }
@@ -49,6 +57,8 @@ pub trait NftMinter {
         token_ticker: ManagedBuffer,
     ) -> SCResult<AsyncCall> {
         require!(self.token_id().is_empty(), "Token already issued");
+
+        self.token_name().set(&token_name);
 
         Ok(self
             .send()
@@ -86,40 +96,21 @@ pub trait NftMinter {
             .async_call())
     }
 
-    /// Run multiple time "giveaway" methods to send many tokens
-    #[only_owner]
-    #[endpoint(giveawayMany)]
-    fn giveaway_many(&self, receiver: ManagedAddress, count: u32) -> SCResult<()> {
-        for _ in 0..count {
-            let next_id = self.next_id().get();
-            self.generate_random_next_id()?;
-            self.giveaway(&receiver, OptionalArg::Some(next_id))?;
-        }
-        Ok(())
-    }
-
     /// This function is the private version of mint, but here you have more control.
     #[only_owner]
     #[endpoint(giveaway)]
     fn giveaway(
         &self,
         receiver: &ManagedAddress,
-        #[var_args] id: OptionalArg<u32>,
+        #[var_args] id: OptionalArg<u64>,
     ) -> SCResult<()> {
-        let id: u32 = match id {
-            OptionalArg::Some(index) => {
-                self.require_token_id_available(&index)?;
-                index
-            }
-            OptionalArg::None => {
-                let next_id = self.next_id().get();
-                self.generate_random_next_id()?;
-                next_id
-            }
+        let next_id: u64 = match id {
+            OptionalArg::Some(index) => index,
+            OptionalArg::None => self.generate_random_id(),
         };
 
         // Mint
-        let nft_nonce = self.create_nft(id)?;
+        let nft_nonce = self.create_nft(next_id)?;
 
         // Send the fresh minted NFT to the given "receiver" address
         self.send().direct(
@@ -130,6 +121,16 @@ pub trait NftMinter {
             &[],                        // data (empty)
         );
 
+        Ok(())
+    }
+
+    /// Run multiple time "giveaway" methods to send many tokens
+    #[only_owner]
+    #[endpoint(giveawayMany)]
+    fn giveaway_many(&self, receiver: &ManagedAddress, count: u64) -> SCResult<()> {
+        for _ in 0..count {
+            self.giveaway(receiver, OptionalArg::Some(self.generate_random_id()))?;
+        }
         Ok(())
     }
 
@@ -144,36 +145,23 @@ pub trait NftMinter {
         Ok(())
     }
 
-    #[only_owner]
-    #[endpoint(pauseMinting)]
-    fn pause_minting(&self) -> SCResult<()> {
-        let paused = true;
-        self.paused().set(&paused);
-
-        Ok(())
-    }
-
-    #[only_owner]
-    #[endpoint(startMinting)]
-    fn start_minting(&self) -> SCResult<()> {
-        self.paused().clear();
-
-        Ok(())
-    }
-
     // endpoints - public
 
     /// Public method to mint a random NFT, this is a payable function.
     #[payable("EGLD")]
     #[endpoint(mint)]
     fn mint(&self, #[payment_amount] payment_amount: BigUint) -> SCResult<()> {
-        self.require_tokens_to_be_sold()?;
-        self.require_is_not_paused()?;
-        self.require_there_is_enough_to_pay(&payment_amount)?;
+        require!(
+            (self.sold_minted_ids().len() as u64) < ON_SALE_SUPPLY,
+            "All on sale token have been minted"
+        );
+        require!(
+            &payment_amount == &self.get_mint_price(),
+            "Invalid amount as payment"
+        );
 
         // Mint
-        let nft_nonce = self.create_nft(self.next_id().get())?;
-        self.generate_random_next_id()?;
+        let nft_nonce = self.create_nft(self.generate_random_id())?;
 
         // Pay the mint cost
         self.send().direct(
@@ -204,20 +192,27 @@ pub trait NftMinter {
     fn get_mint_price(&self) -> BigUint {
         const CENT: u64 = ONE_EGLD / 100;
 
+        // TODO: Tmp code for devnet tests
         let mint_price = match self.sold_minted_ids().len() {
-            // range from 1 to 2700
-            supply if supply < 200 => 10 * CENT, // the next 200 are at 0,1 egld
-            supply if supply < 700 => 20 * CENT, // the next 500 are at 0,2 egld
-            supply if supply < 1200 => 25 * CENT, // the next 500 are at 0,25 egld
-            supply if supply < 1700 => 30 * CENT, // the next 500 are at 0,3 egld
-            supply if supply < 2200 => 35 * CENT, // the next 500 are at 0,35 egld
-            _ => 40 * CENT,                      // the last 500 are at 0,4 egld
+            // range from 1 to 40
+            supply if supply < 10 => 1 * CENT, // the next 200 are at 0,1 egld
+            supply if supply < 20 => 2 * CENT, // the next 500 are at 0,2 egld
+            supply if supply < 30 => 3 * CENT, // the next 500 are at 0,25 egld
+            _ => 4 * CENT,                     // the last 500 are at 0,4 egld
         };
+
+        // let mint_price = match self.sold_minted_ids().len() {
+        //     // range from 1 to 2700
+        //     supply if supply < 200 => 10 * CENT, // the next 200 are at 0,1 egld
+        //     supply if supply < 700 => 20 * CENT, // the next 500 are at 0,2 egld
+        //     supply if supply < 1200 => 25 * CENT, // the next 500 are at 0,25 egld
+        //     supply if supply < 1700 => 30 * CENT, // the next 500 are at 0,3 egld
+        //     supply if supply < 2200 => 35 * CENT, // the next 500 are at 0,35 egld
+        //     _ => 40 * CENT,                      // the last 500 are at 0,4 egld
+        // };
 
         BigUint::from(mint_price)
     }
-
-    // Convert to hex
 
     #[view(getMintedCount)]
     fn get_minted_count(&self) -> usize {
@@ -250,10 +245,14 @@ pub trait NftMinter {
 
     // private
 
-    fn create_nft(&self, id: u32) -> SCResult<u64> {
+    fn create_nft(&self, id: u64) -> SCResult<u64> {
         self.require_token_issued()?;
         self.require_local_roles_set()?;
-        self.require_tokens_to_be_mined()?;
+        let total_minted = self.minted_ids().len() as u64;
+        require!(total_minted < MAX_SUPPLY, "All token have been minted");
+        require!(!self.minted_ids().contains(&id), "Token already minted");
+        require!(id > 0, "Token id must be greater than 0");
+        require!(id <= MAX_SUPPLY, "Token id out of collection");
 
         // Build token metadata
         let token_identifier = self.token_id().get();
@@ -284,21 +283,21 @@ pub trait NftMinter {
     }
 
     /// Return the NFT item name like "Lynxee #420"
-    fn build_name(&self, id: &u32) -> ManagedBuffer {
+    fn build_name(&self, id: &u64) -> ManagedBuffer {
         let mut name = self.token_name().get();
         name.append(&self.str_to_buffer(" #"));
-        name.append(&self.u32_to_buffer(id));
+        name.append(&self.u64_to_buffer(id));
         name
     }
 
     /// Build a vector with the image uri inside
-    fn build_uris(&self, index: &u32) -> ManagedVec<ManagedBuffer> {
+    fn build_uris(&self, index: &u64) -> ManagedVec<ManagedBuffer> {
         let mut uris = ManagedVec::new();
 
         let mut img_ipfs_uri = self.str_to_buffer(IPFS_SCHEME);
         img_ipfs_uri.append(&self.image_cid().get());
         img_ipfs_uri.append(&self.str_to_buffer(URI_SLASH));
-        img_ipfs_uri.append(&self.u32_to_buffer(index));
+        img_ipfs_uri.append(&self.u64_to_buffer(index));
         img_ipfs_uri.append(&self.str_to_buffer(IMAGE_EXT));
 
         uris.push(img_ipfs_uri);
@@ -307,14 +306,14 @@ pub trait NftMinter {
 
     /// Build the attributes Buffer including the metadata json
     /// Format: tags:tag1,tag2;metadata:ipfsCID/1.json
-    fn build_attributes(&self, index: &u32) -> ManagedBuffer {
+    fn build_attributes(&self, index: &u64) -> ManagedBuffer {
         let mut attributes = ManagedBuffer::new();
 
         // metadata:cid;
         attributes.append(&self.str_to_buffer(METADATA_KEY_NAME));
         attributes.append(&self.json_cid().get());
         attributes.append(&self.str_to_buffer(URI_SLASH));
-        attributes.append(&self.u32_to_buffer(index));
+        attributes.append(&self.u64_to_buffer(index));
         attributes.append(&self.str_to_buffer(METADATA_FILE_EXTENSION));
         attributes.append(&self.str_to_buffer(ATTR_SEPARATOR));
         // tags:tag1,tag2
@@ -328,27 +327,25 @@ pub trait NftMinter {
     /// So, excepted for special ones, we'll mint them randomly to mint them randomly.
     /// This function generate randomly the next available id.
     // TODO: May be optimized by looking for the resting range instead whole range
-    fn generate_random_next_id(&self) -> SCResult<()> {
+    fn generate_random_id(&self) -> u64 {
         // It starts at 11 because the ten firsts are reserved.
-        const STARTING_INDEX: u32 = 11;
+        const STARTING_INDEX: u64 = 11;
 
-        // get random number
         let mut rand_source = RandomnessSource::<Self::Api>::new();
-        let mut rand_index = rand_source.next_u32_in_range(STARTING_INDEX, MAX_SUPPLY);
+        let mut rand_index = rand_source.next_u64_in_range(STARTING_INDEX, MAX_SUPPLY);
 
         while self.minted_ids().contains(&rand_index) {
-            rand_index = rand_source.next_u32_in_range(STARTING_INDEX, MAX_SUPPLY);
+            rand_index = rand_source.next_u64_in_range(STARTING_INDEX, MAX_SUPPLY);
         }
 
-        self.next_id().set(rand_index);
-        Ok(())
+        rand_index
     }
 
     fn str_to_buffer(&self, string: &str) -> ManagedBuffer {
         ManagedBuffer::new_from_bytes(string.as_bytes())
     }
 
-    fn u32_to_buffer(&self, string: &u32) -> ManagedBuffer {
+    fn u64_to_buffer(&self, string: &u64) -> ManagedBuffer {
         use alloc::string::ToString;
         ManagedBuffer::new_from_bytes(string.to_string().as_bytes())
     }
@@ -357,43 +354,6 @@ pub trait NftMinter {
 
     fn require_token_issued(&self) -> SCResult<()> {
         require!(!self.token_id().is_empty(), "Token not issued");
-        Ok(())
-    }
-
-    fn require_there_is_enough_to_pay(&self, payment_amount: &BigUint) -> SCResult<()> {
-        require!(
-            payment_amount == &self.get_mint_price(),
-            "Invalid amount as payment"
-        );
-        Ok(())
-    }
-
-    fn require_token_id_available(&self, id: &u32) -> SCResult<()> {
-        require!(!self.minted_ids().contains(id), "Token id is already taken");
-        Ok(())
-    }
-
-    fn require_tokens_to_be_mined(&self) -> SCResult<()> {
-        require!(
-            (self.minted_ids().len() as u32) < MAX_SUPPLY,
-            "All token have been minted"
-        );
-        Ok(())
-    }
-
-    fn require_tokens_to_be_sold(&self) -> SCResult<()> {
-        require!(
-            (self.sold_minted_ids().len() as u32) < ON_SALE_SUPPLY,
-            "All on sale token have been minted"
-        );
-        Ok(())
-    }
-
-    fn require_is_not_paused(&self) -> SCResult<()> {
-        require!(
-            self.paused().is_empty(),
-            "The minting is paused or haven't started yet!"
-        );
         Ok(())
     }
 
@@ -434,19 +394,12 @@ pub trait NftMinter {
 
     // Set map to store all minted nfts
     #[storage_mapper("mintedIds")]
-    fn minted_ids(&self) -> SetMapper<u32>;
+    fn minted_ids(&self) -> SetMapper<u64>;
 
     // Set map to store sold minted nfts
     #[storage_mapper("soldMintedIds")]
-    fn sold_minted_ids(&self) -> SetMapper<u32>;
+    fn sold_minted_ids(&self) -> SetMapper<u64>;
 
     #[storage_mapper("royalties")]
     fn royalties(&self) -> SingleValueMapper<BigUint>;
-
-    #[storage_mapper("paused")]
-    fn paused(&self) -> SingleValueMapper<bool>;
-
-    // We save the next id in a var to be able to mock it in unit tests
-    #[storage_mapper("nextId")]
-    fn next_id(&self) -> SingleValueMapper<u32>;
 }

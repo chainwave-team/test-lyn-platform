@@ -19,9 +19,7 @@ elrond_wasm_node::wasm_endpoints! {
         giveawayMany
         issueToken
         mint
-        pauseMinting
         setLocalRoles
         setRoyalties
-        startMinting
     )
 }
