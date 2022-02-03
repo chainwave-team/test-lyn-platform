@@ -5,10 +5,10 @@
 # + add 0x before
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgqzgflzsyc2g2wnvhlk25f45xdev8xyufxjg9qmex5m4"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgq3ztcmjzdkq5xkm445xtj7v0ygmgaue7qjg9q2gd7at"
 
-TOKEN_TICK="0x4c595858" # LYXX
-TOKEN_NAME="0x4d794c787854657374" # MyLxxTest
+TOKEN_TICK="0x544d5443" # TMTC
+TOKEN_NAME="0x546f696d656d65" # Toimeme
 
 erdpy --verbose \
     contract call ${SC_ADDRESS} \

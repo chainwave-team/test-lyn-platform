@@ -11,6 +11,7 @@ const ROYALTIES_MAX: u64 = 10_000;
 const MAX_SUPPLY: u64 = 50; // 3000;
                             // TODO: WARNING - FAKE DATA TO TEST
 const ON_SALE_SUPPLY: u64 = 40; // 2700;
+const PRE_SALE_QTY: u64 = 10; // 200
 const ONE_EGLD: u64 = 1_000_000_000_000_000_000;
 const IMAGE_EXT: &str = ".png";
 const IPFS_SCHEME: &str = "ipfs://";
@@ -151,13 +152,23 @@ pub trait NftMinter {
     #[payable("EGLD")]
     #[endpoint(mint)]
     fn mint(&self, #[payment_amount] payment_amount: BigUint) -> SCResult<()> {
+        let sold_minted_count = self.sold_minted_ids().len();
+        let is_pre_sales: bool = sold_minted_count < PRE_SALE_QTY as usize;
+        let caller = self.blockchain().get_caller();
+        let caller_mint_count = self.sold_count_by_address(&caller).get();
+        let max_per_address = if is_pre_sales { 1 } else { 4 };
+
         require!(
-            (self.sold_minted_ids().len() as u64) < ON_SALE_SUPPLY,
+            (sold_minted_count as u64) < ON_SALE_SUPPLY,
             "All on sale token have been minted"
         );
         require!(
             &payment_amount == &self.get_mint_price(),
             "Invalid amount as payment"
+        );
+        require!(
+            caller_mint_count < max_per_address,
+            "max mint per person reached"
         );
 
         // Mint
@@ -174,12 +185,15 @@ pub trait NftMinter {
 
         // Send the fresh minted NFT to the caller
         self.send().direct(
-            &self.blockchain().get_caller(), // to
-            &self.token_id().get(),          // token
-            nft_nonce,                       // nonce
-            &BigUint::from(NFT_AMOUNT),      // amount
-            &[],                             // data
+            &caller,                    // to
+            &self.token_id().get(),     // token
+            nft_nonce,                  // nonce
+            &BigUint::from(NFT_AMOUNT), // amount
+            &[],                        // data
         );
+
+        self.sold_count_by_address(&caller)
+            .set(caller_mint_count + 1);
 
         Ok(())
     }
@@ -402,4 +416,7 @@ pub trait NftMinter {
 
     #[storage_mapper("royalties")]
     fn royalties(&self) -> SingleValueMapper<BigUint>;
+
+    #[storage_mapper("mintCountByAddress")]
+    fn sold_count_by_address(&self, address: &ManagedAddress) -> SingleValueMapper<usize>;
 }

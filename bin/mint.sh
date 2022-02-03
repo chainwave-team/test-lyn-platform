@@ -5,12 +5,15 @@
 # + add 0x before
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgqzgflzsyc2g2wnvhlk25f45xdev8xyufxjg9qmex5m4"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgq3ztcmjzdkq5xkm445xtj7v0ygmgaue7qjg9q2gd7at"
+
+OWNER_PEM="wallets/owner/owner.pem"
+HEIDI_PEM="wallets/users/heidi.pem"
 
 erdpy --verbose \
     contract call ${SC_ADDRESS} \
     --recall-nonce \
-    --pem="wallets/owner/owner.pem" \
+    --pem=${HEIDI_PEM} \
     --gas-limit=100000000 \
     --value=10000000000000000 \
     --function="mint" \
