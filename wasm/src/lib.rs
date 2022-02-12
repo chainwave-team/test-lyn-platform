@@ -21,5 +21,6 @@ elrond_wasm_node::wasm_endpoints! {
         mint
         setLocalRoles
         setRoyalties
+        whiteList
     )
 }

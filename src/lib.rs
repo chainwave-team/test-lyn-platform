@@ -80,7 +80,13 @@ pub trait NftMinter {
             .async_call()
             .with_callback(self.callbacks().issue_callback()))
     }
-
+  
+    #[only_owner]
+    #[endpoint(whiteList)]
+    fn add_whitelist(&self, user: &ManagedAddress) -> SCResult<()> {
+        self.white_list(&user);
+        Ok(())
+    }
     #[only_owner]
     #[endpoint(setLocalRoles)]
     fn set_local_roles(&self) -> SCResult<AsyncCall> {
@@ -419,4 +425,8 @@ pub trait NftMinter {
 
     #[storage_mapper("mintCountByAddress")]
     fn sold_count_by_address(&self, address: &ManagedAddress) -> SingleValueMapper<usize>;
+
+    #[storage_mapper("wlAddresses")]
+    fn white_list(&self, address: &ManagedAddress) -> SingleValueMapper<ManagedAddress>;
+
 }
