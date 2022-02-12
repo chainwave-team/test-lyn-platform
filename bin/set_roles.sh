@@ -5,7 +5,7 @@
 # + add 0x before
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgq3ztcmjzdkq5xkm445xtj7v0ygmgaue7qjg9q2gd7at"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgq2avw32d34da7hy0e4n0kjxe3afe7g4kjjg9qhfm055"
 
 erdpy --verbose \
     contract call ${SC_ADDRESS} \

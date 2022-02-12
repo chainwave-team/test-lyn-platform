@@ -80,13 +80,13 @@ pub trait NftMinter {
             .async_call()
             .with_callback(self.callbacks().issue_callback()))
     }
-  
     #[only_owner]
     #[endpoint(whiteList)]
-    fn add_whitelist(&self, user: &ManagedAddress) -> SCResult<()> {
-        self.white_list(&user);
+    fn add_whitelist(&self, address: ManagedAddress) -> SCResult<()> {
+        self.white_list(&address).insert(address);
         Ok(())
     }
+
     #[only_owner]
     #[endpoint(setLocalRoles)]
     fn set_local_roles(&self) -> SCResult<AsyncCall> {
@@ -162,8 +162,9 @@ pub trait NftMinter {
         let is_pre_sales: bool = sold_minted_count < PRE_SALE_QTY as usize;
         let caller = self.blockchain().get_caller();
         let caller_mint_count = self.sold_count_by_address(&caller).get();
-        let max_per_address = if is_pre_sales { 1 } else { 4 };
-
+        // let max_per_address = if is_pre_sales { 1 } else { 4 };
+        let max_per_address = if is_pre_sales { 5 } else { 20 }; // for tests purposes
+        let is_whitelisted = self.white_list(&caller).contains(&caller);
         require!(
             (sold_minted_count as u64) < ON_SALE_SUPPLY,
             "All on sale token have been minted"
@@ -176,7 +177,7 @@ pub trait NftMinter {
             caller_mint_count < max_per_address,
             "max mint per person reached"
         );
-
+        require!(is_pre_sales && is_whitelisted, "Caller not whitelisted");
         // Mint
         let nft_nonce = self.create_nft(self.generate_random_id())?;
 
@@ -427,6 +428,5 @@ pub trait NftMinter {
     fn sold_count_by_address(&self, address: &ManagedAddress) -> SingleValueMapper<usize>;
 
     #[storage_mapper("wlAddresses")]
-    fn white_list(&self, address: &ManagedAddress) -> SingleValueMapper<ManagedAddress>;
-
+    fn white_list(&self, address: &ManagedAddress) -> SetMapper<ManagedAddress>;
 }
