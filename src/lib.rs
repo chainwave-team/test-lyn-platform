@@ -166,7 +166,7 @@ pub trait NftMinter {
         let max_per_address = if is_pre_sales { 5 } else { 20 }; // for tests purposes
         let is_whitelisted = self.white_list(&caller).contains(&caller);
         require!(
-            (sold_minted_count as u64) < ON_SALE_SUPPLY,
+            (sold_minted_count as u64) <= ON_SALE_SUPPLY,
             "All on sale token have been minted"
         );
         require!(
