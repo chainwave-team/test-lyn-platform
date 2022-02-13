@@ -19,8 +19,11 @@ elrond_wasm_node::wasm_endpoints! {
         giveawayMany
         issueToken
         mint
+        mintedByAdress
+        mintedIds
         setLocalRoles
         setRoyalties
+        soldMintedIds
         whiteList
     )
 }

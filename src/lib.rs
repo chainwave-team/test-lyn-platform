@@ -177,7 +177,9 @@ pub trait NftMinter {
             caller_mint_count < max_per_address,
             "max mint per person reached"
         );
-        require!(is_pre_sales && is_whitelisted, "Caller not whitelisted");
+        if is_pre_sales {
+            require!(is_whitelisted, "Caller not whitelisted");
+        }
         // Mint
         let nft_nonce = self.create_nft(self.generate_random_id())?;
 
@@ -214,12 +216,13 @@ pub trait NftMinter {
         const CENT: u64 = ONE_EGLD / 100;
 
         // TODO: Tmp code for devnet tests
-        let mint_price = match self.sold_minted_ids().len() {
+        let already_sold = self.sold_minted_ids().len() as usize;
+        let mint_price = match already_sold {
             // range from 1 to 40
-            supply if supply < 10 => 1 * CENT, // the next 200 are at 0,1 egld
-            supply if supply < 20 => 2 * CENT, // the next 500 are at 0,2 egld
-            supply if supply < 30 => 3 * CENT, // the next 500 are at 0,25 egld
-            _ => 4 * CENT,                     // the last 500 are at 0,4 egld
+            0..=10 => 1 * CENT,  // the next 200 are at 0,1 egld
+            11..=20 => 2 * CENT, // the next 500 are at 0,2 egld
+            21..=30 => 3 * CENT, // the next 500 are at 0,25 egld
+            _ => 4 * CENT,       // the last 500 are at 0,4 egld
         };
 
         // let mint_price = match self.sold_minted_ids().len() {
@@ -299,7 +302,7 @@ pub trait NftMinter {
         );
 
         self.minted_ids().insert(id);
-
+        self.sold_minted_ids().insert(id);
         Ok(nonce)
     }
 
@@ -414,16 +417,19 @@ pub trait NftMinter {
     fn tags(&self) -> SingleValueMapper<ManagedBuffer>;
 
     // Set map to store all minted nfts
+    #[view(mintedIds)]
     #[storage_mapper("mintedIds")]
     fn minted_ids(&self) -> SetMapper<u64>;
 
     // Set map to store sold minted nfts
+    #[view(soldMintedIds)]
     #[storage_mapper("soldMintedIds")]
     fn sold_minted_ids(&self) -> SetMapper<u64>;
 
     #[storage_mapper("royalties")]
     fn royalties(&self) -> SingleValueMapper<BigUint>;
 
+    #[view(mintedByAdress)]
     #[storage_mapper("mintCountByAddress")]
     fn sold_count_by_address(&self, address: &ManagedAddress) -> SingleValueMapper<usize>;
 

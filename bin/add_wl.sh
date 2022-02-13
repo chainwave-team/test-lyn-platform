@@ -5,9 +5,9 @@
 # + add 0x before
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgq2avw32d34da7hy0e4n0kjxe3afe7g4kjjg9qhfm055"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgqwtya9fwg62am9smuy2p7x50q4jh5y3tfjg9q7lqesj"
 
-HEIDI_ADDRESS_BECH32="erd1gmpleuv62ap74c8qs52w3qjpues8xdhk00nmdr0sdkmes4lchxzsfu0dwr"
+HEIDI_ADDRESS_BECH32=$1
 HEIDI_ADDRESS_HEX=0x$(erdpy wallet bech32 --decode ${HEIDI_ADDRESS_BECH32})
 
 OWNER_PEM="wallets/owner/owner.pem"

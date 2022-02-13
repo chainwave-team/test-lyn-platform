@@ -5,10 +5,10 @@
 # + add 0x before
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgq2avw32d34da7hy0e4n0kjxe3afe7g4kjjg9qhfm055"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgqwtya9fwg62am9smuy2p7x50q4jh5y3tfjg9q7lqesj"
 
 TOKEN_TICK="0x544d5443" # TMTC
-TOKEN_NAME="0x546f696d656d65" # Toimeme
+TOKEN_NAME="0x546f696d656d66" # Toimeme
 
 erdpy --verbose \
     contract call ${SC_ADDRESS} \
