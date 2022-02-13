@@ -5,7 +5,7 @@
 # + add 0x before
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgqwtya9fwg62am9smuy2p7x50q4jh5y3tfjg9q7lqesj"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgqa0nul36u4xeqg9058y0n2mm7ydw267adjg9qw9lk5n"
 
 HEIDI_ADDRESS_BECH32=$1
 HEIDI_ADDRESS_HEX=0x$(erdpy wallet bech32 --decode ${HEIDI_ADDRESS_BECH32})

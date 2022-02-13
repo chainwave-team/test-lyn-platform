@@ -8,9 +8,9 @@ elrond_wasm::derive_imports!();
 const NFT_AMOUNT: u64 = 1;
 const ROYALTIES_MAX: u64 = 10_000;
 // TODO: WARNING - FAKE DATA TO TEST
-const MAX_SUPPLY: u64 = 50; // 3000;
+const MAX_SUPPLY: u64 = 51; // 3000;
                             // TODO: WARNING - FAKE DATA TO TEST
-const ON_SALE_SUPPLY: u64 = 40; // 2700;
+const ON_SALE_SUPPLY: u64 = 41; // 2700;
 const PRE_SALE_QTY: u64 = 10; // 200
 const ONE_EGLD: u64 = 1_000_000_000_000_000_000;
 const IMAGE_EXT: &str = ".png";
@@ -166,7 +166,7 @@ pub trait NftMinter {
         let max_per_address = if is_pre_sales { 5 } else { 20 }; // for tests purposes
         let is_whitelisted = self.white_list(&caller).contains(&caller);
         require!(
-            (sold_minted_count as u64) <= ON_SALE_SUPPLY,
+            (sold_minted_count as u64) < ON_SALE_SUPPLY,
             "All on sale token have been minted"
         );
         require!(
@@ -213,7 +213,7 @@ pub trait NftMinter {
     /// The get_mint_price works on the 2700 on sale nfts, don't use it for giveaway, it makes sense.
     #[view(getMintPrice)]
     fn get_mint_price(&self) -> BigUint {
-        const CENT: u64 = ONE_EGLD / 100;
+        const CENT: u64 = ONE_EGLD / 10;
 
         // TODO: Tmp code for devnet tests
         let already_sold = self.sold_minted_ids().len() as usize;
