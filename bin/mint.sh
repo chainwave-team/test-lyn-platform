@@ -5,7 +5,7 @@
 # + add 0x before
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgq8tv4atwzkxfagyly25cylkdj90gxkcx2jg9qdmrppc"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgqgl9fndnaa3y8jn550urwehyq967hsdjdjg9q6v94vn"
 
 OWNER_PEM="wallets/owner/owner.pem"
 HEIDI_PEM="wallets/users/alice.pem"

@@ -115,10 +115,8 @@ pub trait NftMinter {
             OptionalArg::Some(index) => index,
             OptionalArg::None => self.generate_random_id(),
         };
-
         // Mint
         let nft_nonce = self.create_nft(next_id)?;
-
         // Send the fresh minted NFT to the given "receiver" address
         self.send().direct(
             &receiver,                  // to
@@ -127,7 +125,6 @@ pub trait NftMinter {
             &BigUint::from(NFT_AMOUNT), // amount (must be 1 for NFT)
             &[],                        // data (empty)
         );
-
         Ok(())
     }
 
@@ -357,12 +354,10 @@ pub trait NftMinter {
         const STARTING_INDEX: u64 = 11;
 
         let mut rand_source = RandomnessSource::<Self::Api>::new();
-        let mut rand_index = rand_source.next_u64_in_range(STARTING_INDEX, MAX_SUPPLY+1);
-
+        let mut rand_index = rand_source.next_u64_in_range(STARTING_INDEX, MAX_SUPPLY + 1);
         while self.minted_ids().contains(&rand_index) {
-            rand_index = rand_source.next_u64_in_range(STARTING_INDEX, MAX_SUPPLY+1);
+            rand_index = rand_source.next_u64_in_range(STARTING_INDEX, MAX_SUPPLY + 1);
         }
-
         rand_index
     }
 
@@ -435,4 +430,9 @@ pub trait NftMinter {
 
     #[storage_mapper("wlAddresses")]
     fn white_list(&self, address: &ManagedAddress) -> SetMapper<ManagedAddress>;
+
+    #[view(getOnSaleSupply)]
+    fn get_for_sale_supply(&self) -> u64 {
+        ON_SALE_SUPPLY
+    }
 }
