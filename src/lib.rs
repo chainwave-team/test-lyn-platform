@@ -8,9 +8,9 @@ elrond_wasm::derive_imports!();
 const NFT_AMOUNT: u64 = 1;
 const ROYALTIES_MAX: u64 = 10_000;
 // TODO: WARNING - FAKE DATA TO TEST
-const MAX_SUPPLY: u64 = 51; // 3000;
+const MAX_SUPPLY: u64 = 50; // 3000;
                             // TODO: WARNING - FAKE DATA TO TEST
-const ON_SALE_SUPPLY: u64 = 41; // 2700;
+const ON_SALE_SUPPLY: u64 = 40; // 2700;
 const PRE_SALE_QTY: u64 = 10; // 200
 const ONE_EGLD: u64 = 1_000_000_000_000_000_000;
 const IMAGE_EXT: &str = ".png";
@@ -351,15 +351,16 @@ pub trait NftMinter {
     /// So, excepted for special ones, we'll mint them randomly to mint them randomly.
     /// This function generate randomly the next available id.
     // TODO: May be optimized by looking for the resting range instead whole range
+    // generates a random usize in the [min, max)
     fn generate_random_id(&self) -> u64 {
         // It starts at 11 because the ten firsts are reserved.
         const STARTING_INDEX: u64 = 11;
 
         let mut rand_source = RandomnessSource::<Self::Api>::new();
-        let mut rand_index = rand_source.next_u64_in_range(STARTING_INDEX, MAX_SUPPLY);
+        let mut rand_index = rand_source.next_u64_in_range(STARTING_INDEX, MAX_SUPPLY+1);
 
         while self.minted_ids().contains(&rand_index) {
-            rand_index = rand_source.next_u64_in_range(STARTING_INDEX, MAX_SUPPLY);
+            rand_index = rand_source.next_u64_in_range(STARTING_INDEX, MAX_SUPPLY+1);
         }
 
         rand_index
@@ -375,7 +376,6 @@ pub trait NftMinter {
     }
 
     // Require functions
-
     fn require_token_issued(&self) -> SCResult<()> {
         require!(!self.token_id().is_empty(), "Token not issued");
         Ok(())
