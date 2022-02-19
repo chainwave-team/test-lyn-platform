@@ -42,12 +42,19 @@ pub trait NftMinter {
         self.image_cid().set(&self.str_to_buffer(IMAGE_CID));
         // self.json_cid().set(&json_cid);
         // self.image_cid().set(&image_cid);
+        self.public_sale_status().set(false);
+
+        let mut ids = Vec::new();
+        for i in 0..=MAX_SUPPLY {
+            ids.push(i);
+        }
+
+        self.left_to_mint_tokens().extend_from_slice(&ids[1..]);
 
         Ok(())
     }
 
     // endpoints - owner-only
-
     #[only_owner]
     #[payable("EGLD")]
     #[endpoint(issueToken)]
@@ -80,10 +87,24 @@ pub trait NftMinter {
             .async_call()
             .with_callback(self.callbacks().issue_callback()))
     }
+
+    // private endpoints
     #[only_owner]
     #[endpoint(whiteList)]
     fn add_whitelist(&self, address: ManagedAddress) -> SCResult<()> {
-        self.white_list(&address).insert(address);
+        self.white_list().insert(address);
+        Ok(())
+    }
+
+    #[endpoint(tokensAvailable)]
+    fn get_tokens_available(&self) -> Vec<usize> {
+        self.get_tokens_available()
+    }
+
+    #[only_owner]
+    #[endpoint(startPublicSale)]
+    fn set_public_sale(&self) -> SCResult<()> {
+        self.public_sale_status().set(true);
         Ok(())
     }
 
@@ -127,7 +148,6 @@ pub trait NftMinter {
         );
         Ok(())
     }
-
     /// Run multiple time "giveaway" methods to send many tokens
     #[only_owner]
     #[endpoint(giveawayMany)]
@@ -155,13 +175,15 @@ pub trait NftMinter {
     #[payable("EGLD")]
     #[endpoint(mint)]
     fn mint(&self, #[payment_amount] payment_amount: BigUint) -> SCResult<()> {
-        let sold_minted_count = self.sold_minted_ids().len();
-        let is_pre_sales: bool = sold_minted_count < PRE_SALE_QTY as usize;
+        let sold_minted_count = self.get_sold_count();
+        let remains_qty_wl: bool = sold_minted_count < PRE_SALE_QTY as usize;
         let caller = self.blockchain().get_caller();
         let caller_mint_count = self.sold_count_by_address(&caller).get();
+        let public_sale_started: bool = self.public_sale_status().get();
         // let max_per_address = if is_pre_sales { 1 } else { 4 };
-        let max_per_address = if is_pre_sales { 5 } else { 20 }; // for tests purposes
-        let is_whitelisted = self.white_list(&caller).contains(&caller);
+        let max_per_address = if remains_qty_wl { 5 } else { 20 }; // for tests purposes
+        let is_whitelisted = self.white_list().contains(&caller);
+
         require!(
             (sold_minted_count as u64) < ON_SALE_SUPPLY,
             "All on sale token have been minted"
@@ -172,11 +194,12 @@ pub trait NftMinter {
         );
         require!(
             caller_mint_count < max_per_address,
-            "max mint per person reached"
+            "Max mint per person reached"
         );
-        if is_pre_sales {
+        if remains_qty_wl && !public_sale_started {
             require!(is_whitelisted, "Caller not whitelisted");
         }
+
         // Mint
         let nft_nonce = self.create_nft(self.generate_random_id())?;
 
@@ -200,7 +223,7 @@ pub trait NftMinter {
 
         self.sold_count_by_address(&caller)
             .set(caller_mint_count + 1);
-
+        self.sold_minted_ids().insert(nft_nonce);
         Ok(())
     }
 
@@ -211,14 +234,13 @@ pub trait NftMinter {
     #[view(getMintPrice)]
     fn get_mint_price(&self) -> BigUint {
         const CENT: u64 = ONE_EGLD / 10;
-
         // TODO: Tmp code for devnet tests
         let already_sold = self.sold_minted_ids().len() as usize;
         let mint_price = match already_sold {
             // range from 1 to 40
-            0..=10 => 1 * CENT,  // the next 200 are at 0,1 egld
-            11..=20 => 2 * CENT, // the next 500 are at 0,2 egld
-            21..=30 => 3 * CENT, // the next 500 are at 0,25 egld
+            11..=20 => 1 * CENT, // the next 200 are at 0,1 egld
+            21..=30 => 2 * CENT, // the next 500 are at 0,2 egld
+            31..=40 => 3 * CENT, // the next 500 are at 0,25 egld
             _ => 4 * CENT,       // the last 500 are at 0,4 egld
         };
 
@@ -246,7 +268,6 @@ pub trait NftMinter {
     }
 
     // callbacks
-
     #[callback]
     fn issue_callback(&self, #[call_result] result: ManagedAsyncCallResult<TokenIdentifier>) {
         match result {
@@ -265,11 +286,10 @@ pub trait NftMinter {
     }
 
     // private
-
     fn create_nft(&self, id: u64) -> SCResult<u64> {
         self.require_token_issued()?;
         self.require_local_roles_set()?;
-        let total_minted = self.minted_ids().len() as u64;
+        let total_minted = self.get_minted_count() as u64;
         require!(total_minted < MAX_SUPPLY, "All token have been minted");
         require!(!self.minted_ids().contains(&id), "Token already minted");
         require!(id > 0, "Token id must be greater than 0");
@@ -299,7 +319,7 @@ pub trait NftMinter {
         );
 
         self.minted_ids().insert(id);
-        self.sold_minted_ids().insert(id);
+        self.left_to_mint_tokens().clear_entry(id as usize);
         Ok(nonce)
     }
 
@@ -314,7 +334,6 @@ pub trait NftMinter {
     /// Build a vector with the image uri inside
     fn build_uris(&self, index: &u64) -> ManagedVec<ManagedBuffer> {
         let mut uris = ManagedVec::new();
-
         let mut img_ipfs_uri = self.str_to_buffer(IPFS_SCHEME);
         img_ipfs_uri.append(&self.image_cid().get());
         img_ipfs_uri.append(&self.str_to_buffer(URI_SLASH));
@@ -349,16 +368,21 @@ pub trait NftMinter {
     /// This function generate randomly the next available id.
     // TODO: May be optimized by looking for the resting range instead whole range
     // generates a random usize in the [min, max)
+    #[endpoint(generateId)]
     fn generate_random_id(&self) -> u64 {
         // It starts at 11 because the ten firsts are reserved.
         const STARTING_INDEX: u64 = 11;
 
+        let left_to_mint_tokens = self.left_to_mint_tokens().len();
+        let max: usize = left_to_mint_tokens + 1;
         let mut rand_source = RandomnessSource::<Self::Api>::new();
-        let mut rand_index = rand_source.next_u64_in_range(STARTING_INDEX, MAX_SUPPLY + 1);
-        while self.minted_ids().contains(&rand_index) {
-            rand_index = rand_source.next_u64_in_range(STARTING_INDEX, MAX_SUPPLY + 1);
-        }
-        rand_index
+        let rand_index = rand_source.next_u64_in_range(STARTING_INDEX, max as u64) as usize;
+        self.left_to_mint_tokens().get(rand_index)
+
+        // while self.minted_ids().contains(&rand_index) {
+        //     rand_index = rand_source.next_u64_in_range(STARTING_INDEX, MAX_SUPPLY);
+        // }
+        // rand_index
     }
 
     fn str_to_buffer(&self, string: &str) -> ManagedBuffer {
@@ -389,7 +413,6 @@ pub trait NftMinter {
     }
 
     // storage
-
     // eg: "LYNX-123456", defined on issue token
     #[view(getTokenId)]
     #[storage_mapper("tokenId")]
@@ -429,10 +452,11 @@ pub trait NftMinter {
     fn sold_count_by_address(&self, address: &ManagedAddress) -> SingleValueMapper<usize>;
 
     #[storage_mapper("wlAddresses")]
-    fn white_list(&self, address: &ManagedAddress) -> SetMapper<ManagedAddress>;
+    fn white_list(&self) -> SetMapper<ManagedAddress>;
 
-    #[view(getOnSaleSupply)]
-    fn get_for_sale_supply(&self) -> u64 {
-        ON_SALE_SUPPLY
-    }
+    #[storage_mapper("publicSaleStatus")]
+    fn public_sale_status(&self) -> SingleValueMapper<bool>;
+
+    #[storage_mapper("leftToMint")]
+    fn left_to_mint_tokens(&self) -> VecMapper<u64>;
 }

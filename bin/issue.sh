@@ -5,10 +5,10 @@
 # + add 0x before
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgqgl9fndnaa3y8jn550urwehyq967hsdjdjg9q6v94vn"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgq24wsm2c3yr3y24gqa93zhvty3y49xaehjg9qfz77je"
 
-TOKEN_TICK="0x41584f4e45" # AXONE
-TOKEN_NAME="0x41584e45" # AXNE
+TOKEN_TICK="0x414258414e45" # AXONE
+TOKEN_NAME="0x41414145" # AXNE
 
 erdpy --verbose \
     contract call ${SC_ADDRESS} \

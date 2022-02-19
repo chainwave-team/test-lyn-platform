@@ -8,6 +8,7 @@ elrond_wasm_node::wasm_endpoints! {
     lynxee
     (
         callBack
+        generateId
         getImageCid
         getJsonCid
         getMintPrice
@@ -24,6 +25,8 @@ elrond_wasm_node::wasm_endpoints! {
         setLocalRoles
         setRoyalties
         soldMintedIds
+        startPublicSale
+        tokensAvailable
         whiteList
     )
 }
