@@ -5,7 +5,7 @@
 # + add 0x before
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgq24wsm2c3yr3y24gqa93zhvty3y49xaehjg9qfz77je"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgqx3p6yg3m8jx6ch8akpxxvfe8vcz8e0yxjg9qfqnst2"
 
 
 erdpy --verbose \

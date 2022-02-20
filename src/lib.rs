@@ -16,6 +16,7 @@ extern crate alloc;
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
+mod publicsale;
 mod random_id;
 mod register;
 mod royalties;
@@ -37,7 +38,11 @@ const JSON_CID: &str = "bafybeiewbfwy2c33zzrn6u57z6ymni4jixdscryj7jovyuiknsklfqb
 
 #[elrond_wasm::contract]
 pub trait NftMinter:
-    register::Register + royalties::Royalties + whitelist::Whitelist + random_id::RandomId
+    register::Register
+    + royalties::Royalties
+    + whitelist::Whitelist
+    + random_id::RandomId
+    + publicsale::PublicSale
 {
     // constructor called on deploy
     #[init]
@@ -53,7 +58,7 @@ pub trait NftMinter:
         self._json_cid().set(&str_to_buffer(JSON_CID));
         self._image_cid().set(&str_to_buffer(IMAGE_CID));
         self._fill_remaining_tokens(MAX_SUPPLY)?;
-
+        self._public_sale_status().set(false);
         Ok(())
     }
 
@@ -109,8 +114,14 @@ pub trait NftMinter:
         );
 
         // caller still could mint
+        let is_public_sale = self._public_sale_status().get();
         let caller = self.blockchain().get_caller();
         let caller_mint_count = self._sold_count_by_address(&caller).get();
+        let is_whitelisted = self._is_whitelisted(&caller);
+
+        if (!is_public_sale) {
+            require!(is_whitelisted, "Caller is not whitelisted");
+        }
         require!(
             caller_mint_count < MAX_MINT_COUNT_BY_ADDRESS,
             "Max mint per person reached"
@@ -158,15 +169,15 @@ pub trait NftMinter:
     /// The get_mint_price works on the 2700 on sale nfts, don't use it for giveaway, it makes sense.
     #[view(getMintPrice)]
     fn get_mint_price(&self, caller: &ManagedAddress) -> BigUint {
+        const CENT: u64 = ONE_EGLD / 10;
         let is_whitelisted = self._is_whitelisted(&caller);
 
         // if is whitelist, return 0.1 EGLD
         if is_whitelisted {
             self._remove_from_whitelist(&caller);
-            return BigUint::from(ONE_EGLD / 10); // 0.1 EGLD
+            return BigUint::from(CENT); // 0.1 EGLD
         }
 
-        const CENT: u64 = ONE_EGLD / 10;
         // TODO: Tmp code for devnet tests
         let already_sold = self._sold_minted_ids().len() as usize;
         let mint_price = match already_sold {

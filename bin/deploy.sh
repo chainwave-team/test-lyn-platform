@@ -13,7 +13,7 @@ erdpy --verbose \
     --recall-nonce \
     --project="." \
     --pem="wallets/owner/owner.pem" \
-    --gas-limit=100000000 \
+    --gas-limit=200000000 \
     --arguments 1000 ${TAGS} \
     --send \
     --outfile="deploy-devnet.interaction.json" \
