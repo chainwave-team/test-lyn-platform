@@ -8,9 +8,6 @@ elrond_wasm_node::wasm_endpoints! {
     lynxee
     (
         callBack
-        generateId
-        getImageCid
-        getJsonCid
         getMintPrice
         getMintedCount
         getSoldCount
@@ -20,13 +17,8 @@ elrond_wasm_node::wasm_endpoints! {
         giveawayMany
         issueToken
         mint
-        mintedByAdress
-        mintedIds
         setLocalRoles
         setRoyalties
-        soldMintedIds
-        startPublicSale
-        tokensAvailable
         whiteList
     )
 }
