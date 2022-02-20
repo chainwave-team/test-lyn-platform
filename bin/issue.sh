@@ -5,9 +5,9 @@
 # + add 0x before
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgql2ltnqk8ze4yfh8ukgrtdn3j3z284y24jg9qd5seek"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgqxjcdsc6r8pyy9qrftgju8rtwagz2vrgrjg9qhzqjl7"
 
-TOKEN_TICK="0x424158414e45" # AXONE
+TOKEN_TICK="0x424142414e45" # AXONE
 TOKEN_NAME="0x41414145" # AXNE
 
 erdpy --verbose \

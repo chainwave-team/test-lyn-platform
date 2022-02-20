@@ -5,7 +5,7 @@
 # + add 0x before
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgqxjcdsc6r8pyy9qrftgju8rtwagz2vrgrjg9qhzqjl7"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgq68n2d9wce8jf7xh2jqs20y8f7707rnj4jg9qevfwmm"
 
 
 erdpy --verbose \
@@ -13,7 +13,7 @@ erdpy --verbose \
     --recall-nonce \
     --pem="wallets/owner/owner.pem" \
     --gas-limit=100000000 \
-    --function="startPublicSale" \
+    --function="pausePublicSale" \
     --send \
     --proxy="https://devnet-gateway.elrond.com" \
     --chain="D"

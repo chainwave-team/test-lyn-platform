@@ -5,7 +5,7 @@
 # + add 0x before
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgql2ltnqk8ze4yfh8ukgrtdn3j3z284y24jg9qd5seek"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgqxjcdsc6r8pyy9qrftgju8rtwagz2vrgrjg9qhzqjl7"
 
 HEIDI_ADDRESS_BECH32=$1
 HEIDI_ADDRESS_HEX=0x$(erdpy wallet bech32 --decode ${HEIDI_ADDRESS_BECH32})
@@ -15,6 +15,7 @@ PROXY="https://devnet-gateway.elrond.com"
 CHAIN="D"
 
 wl() {
+    echo $1  ${HEIDI_ADDRESS_HEX}
     erdpy --verbose contract call ${SC_ADDRESS} \
         --recall-nonce \
         --pem=${OWNER_PEM} \
