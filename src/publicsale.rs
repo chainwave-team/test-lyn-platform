@@ -11,6 +11,12 @@ pub trait PublicSale {
         self._public_sale_status().set(true);
         Ok(())
     }
+    #[only_owner]
+    #[endpoint(pausePublicSale)]
+    fn pause_public_sale(&self) -> SCResult<()> {
+        self._public_sale_status().set(false);
+        Ok(())
+    }
     /*
     Switch to true when the public sale starts
     */

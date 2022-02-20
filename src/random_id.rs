@@ -42,13 +42,17 @@ pub trait RandomId {
     /// Set the initial remaining data, will be decremented at each mint
     fn _fill_remaining_tokens(&self, supply: usize) -> SCResult<()> {
         let mut remaining_tokens_ids = self._remaining_tokens_ids();
-        require!(
-            remaining_tokens_ids.is_empty(),
-            "remaining_tokens_ids already filled"
-        );
 
-        for i in 1..=supply as u32 {
-            remaining_tokens_ids.insert(i);
+        // require!(
+        //     remaining_tokens_ids.is_empty(),
+        //     "remaining_tokens_ids already filled"
+        // );
+        
+        // TESTS PURPOSES
+        if (remaining_tokens_ids.is_empty()) {
+            for i in 1..=supply as u32 {
+                remaining_tokens_ids.insert(i);
+            }
         }
 
         Ok(())

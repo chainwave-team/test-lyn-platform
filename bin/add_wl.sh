@@ -5,7 +5,7 @@
 # + add 0x before
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgqx3p6yg3m8jx6ch8akpxxvfe8vcz8e0yxjg9qfqnst2"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgql2ltnqk8ze4yfh8ukgrtdn3j3z284y24jg9qd5seek"
 
 HEIDI_ADDRESS_BECH32=$1
 HEIDI_ADDRESS_HEX=0x$(erdpy wallet bech32 --decode ${HEIDI_ADDRESS_BECH32})
@@ -18,8 +18,8 @@ wl() {
     erdpy --verbose contract call ${SC_ADDRESS} \
         --recall-nonce \
         --pem=${OWNER_PEM} \
-        --gas-limit=5000000 \
-        --function $1 \
+        --gas-limit=6000000 \
+        --function whiteList \
         --arguments ${HEIDI_ADDRESS_HEX} $2 \
         --send \
         --proxy=${PROXY} \
@@ -28,7 +28,4 @@ wl() {
 
 # Run
 # ---
-
-# give giveaway
-# give giveawayMany 3
 wl whiteList

@@ -167,12 +167,17 @@ pub trait NftMinter:
 
     /// This function return the current mint price based on how many have been mined.
     /// The get_mint_price works on the 2700 on sale nfts, don't use it for giveaway, it makes sense.
+
     #[view(getMintPrice)]
     fn get_mint_price(&self, caller: &ManagedAddress) -> BigUint {
         const CENT: u64 = ONE_EGLD / 10;
         let is_whitelisted = self._is_whitelisted(&caller);
 
-        // if is whitelist, return 0.1 EGLD
+        /*
+        if user whitelisted and the public sale has not started yet,
+        return 0.1 EGLD
+        */
+        // if is_whitelisted && !self._public_sale_status().get() {
         if is_whitelisted {
             self._remove_from_whitelist(&caller);
             return BigUint::from(CENT); // 0.1 EGLD

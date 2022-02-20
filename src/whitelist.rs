@@ -1,7 +1,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-const MAX_PRE_SALE: usize = 10; // 200
+const MAX_WHITELISTED_USERS: usize = 10; // 200
 
 // When a whitelisted user uses its advantage,
 // then he is remove from the whitelist.
@@ -13,8 +13,8 @@ pub trait Whitelist {
     #[only_owner]
     #[endpoint(whiteList)]
     fn add_to_whitelist(&self, address: ManagedAddress) -> SCResult<()> {
-        let total = self._whitelist_total().get();
-        require!(total >= MAX_PRE_SALE, "The whitelist is full");
+        let total: usize = self._whitelist_total().get();
+        require!(total <= MAX_WHITELISTED_USERS, "The whitelist is full");
 
         // add to the whitelist
         self._whitelist().insert(address);
@@ -38,7 +38,6 @@ pub trait Whitelist {
     }
 
     // storage
-
     // current whitelisted addresses
     #[storage_mapper("whitelistedAddresses")]
     fn _whitelist(&self) -> SetMapper<ManagedAddress>;

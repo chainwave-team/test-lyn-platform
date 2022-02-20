@@ -17,6 +17,7 @@ elrond_wasm_node::wasm_endpoints! {
         giveawayMany
         issueToken
         mint
+        pausePublicSale
         setLocalRoles
         setRoyalties
         startPublicSale
