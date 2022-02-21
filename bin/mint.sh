@@ -5,17 +5,18 @@
 # + add 0x before
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgqxjcdsc6r8pyy9qrftgju8rtwagz2vrgrjg9qhzqjl7"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgqhm8x32u8vta26sdknvt4wklvy0mpd79wjg9qyr3wj0"
 
 OWNER_PEM="wallets/owner/owner.pem"
-HEIDI_PEM="wallets/users/eve.pem"
+# HEIDI_PEM="wallets/users/carol.pem"
+HEIDI_PEM="wallets/users/$1.pem"
 
 erdpy --verbose \
     contract call ${SC_ADDRESS} \
     --recall-nonce \
     --pem=${HEIDI_PEM} \
-    --gas-limit=30000000\
-    --value=400000000000000000 \
+    --gas-limit=60000000\
+    --value=300000000000000000 \
     --function="mint" \
     --send \
     --proxy="https://devnet-gateway.elrond.com" \

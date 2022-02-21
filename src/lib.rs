@@ -27,9 +27,8 @@ use crate::utils::{build_attributes, build_name, build_uris, str_to_buffer};
 
 // TODO: WARNING - FAKE DATA TO TEST
 const ON_SALE_SUPPLY: usize = 40; // 2700;
-
 const MAX_SUPPLY: usize = 50;
-const MAX_MINT_COUNT_BY_ADDRESS: usize = 4;
+const MAX_MINT_COUNT_BY_ADDRESS: usize = 5;
 const ONE_EGLD: u64 = 1_000_000_000_000_000_000;
 
 // TODO: Pass it as function args (in init ideally)
@@ -177,7 +176,6 @@ pub trait NftMinter:
         if user whitelisted and the public sale has not started yet,
         return 0.1 EGLD
         */
-        // if is_whitelisted && !self._public_sale_status().get() {
         if is_whitelisted {
             self._remove_from_whitelist(&caller);
             return BigUint::from(CENT); // 0.1 EGLD
