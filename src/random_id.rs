@@ -14,7 +14,7 @@ pub trait RandomId {
         let start: u32 = RESERVED_COUNT as u32 + 1;
         remaining_tokens_ids = Vec::new();
         for i in start..=supply as u32 {
-            remaining_tokens_ids.insert(0, i); // mb use push instead?
+            remaining_tokens_ids.push(i);
         }
         self._remaining_tokens_ids().set(remaining_tokens_ids);
         Ok(())
@@ -27,8 +27,8 @@ pub trait RandomId {
             "remaining_tokens_ids is empty"
         );
         let mut rand_source = RandomnessSource::<Self::Api>::new();
-        for i in 0..((remaining_tokens_ids.len() - 1) / 2) {
-            let rand_index = rand_source.next_usize_in_range(i, remaining_tokens_ids.len());
+        for i in 0..(remaining_tokens_ids.len() - 1) {
+            let rand_index = rand_source.next_usize_in_range(i, remaining_tokens_ids.len() - 1);
             let v1 = remaining_tokens_ids[rand_index];
             let v2 = remaining_tokens_ids[i];
             remaining_tokens_ids[i] = v1;
