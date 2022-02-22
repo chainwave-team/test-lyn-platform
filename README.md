@@ -64,11 +64,8 @@ chmod +x ./bin/generate_api.sh
 
 ### Endpoints
 
-- `issueToken()`
-- `setLocalRoles()`
 - `giveaway()`
 - `giveawayMany()`
-- `setRoyalties()`
 - `mint()`
 
 ### View
@@ -76,21 +73,15 @@ chmod +x ./bin/generate_api.sh
 - `getMintPrice()`
 - `getMintedCount()`
 - `getSoldCount()`
-- `getTokenId()`
-- `getTokenName()`
-- `getJsonCid()`
-- `getImageCid()`
 
 ### Storage
 
-- `tokenId`
-- `tokenName`
+- `soldMintedIds`
+- `mintCountByAddress`
 - `jsonCid`
 - `imageCid`
 - `tags`
 - `mintedIds`
-- `soldMintedIds`
-- `royalties`
 
 ## Supply distribution and mint process
 
@@ -104,7 +95,7 @@ We will reserve 300 NFTs
 
 Then for the 2700 left item, the price will grow by mint count steps from 0.1 EGLD to 0.4 EGLD.
 
-Note: The 10 first NFT (4 for the team, 6 auctions)  from id 1 to 10 will be locked. Only the owner can mint and transfer it.
+Note: The 10 first NFT (4 for the team, 6 auctions) from id 1 to 10 will be locked. Only the owner can mint and transfer it.
 
 ## Test deploy on prod
 
@@ -115,7 +106,7 @@ We will deploy 50 lips + 10 reserved images on IPFS using nft.storage (`car` for
 Then regenerate (still with HashLips) json files and create manually the 10 reserved.
 
 Images: `bafybeidfyg4tkxazcrih3eaocpwn4m67vyhcuocrujwple6yjolxktniqm`
-JSON  : `bafybeiewbfwy2c33zzrn6u57z6ymni4jixdscryj7jovyuiknsklfqb4n4`
+JSON : `bafybeiewbfwy2c33zzrn6u57z6ymni4jixdscryj7jovyuiknsklfqb4n4`
 
 > Note: For this test, the uniques are the first 10 from 1 to 10, but the SC and the real collection will have 16 uniques at first from 1 to 16.
 
@@ -142,10 +133,25 @@ For each scripts in the `./bin` folder, look inside the variable before running 
 Now the contract and the token are ready to work.
 
 ```sh
+# Add a whitelisted user
+./bin/add_wl.sh <adress>
+
+/!\ (Un)comment the type of mint (bulk/single)
 # Mint: Cost EGLD - Public - Random id
 ./bin/mint.sh
+
+/!\ Add wallets filenames into ./bin/bulk_mint.sh
+#Bulk mint
+./bin/bulk_mint.sh
 
 # Giveaway: Send one random, one precise or many NFt to an address
 # See more about params in the file itself
 ./bin/giveaway.sh
+
+#Start public sale
+./bin/startpublicsale.sh
+
+#Pause public sale
+./bin/closepublicsale.sh
+
 ```

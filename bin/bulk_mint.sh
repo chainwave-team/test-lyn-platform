@@ -9,7 +9,7 @@ declare -a ADRESSES=(
     # "heidi"
     # "ivan"
     # "judy"
-    # "wallet1"
+    "wallet1"
     "wallet2"
     "wallet3"
     "wallet4"
