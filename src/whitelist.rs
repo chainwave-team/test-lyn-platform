@@ -28,6 +28,21 @@ pub trait Whitelist {
 
         Ok(())
     }
+    #[only_owner]
+    #[endpoint(whiteListMany)]
+    fn many_add_to_whitelist(&self, addresses: ManagedVec<ManagedAddress>) -> SCResult<()> {
+        self._whitelist().extend(&addresses);
+        // increment total count
+        if self._whitelist_total().is_empty() {
+            self._whitelist_total().set(1);
+        } else {
+            for _ in 0..addresses.len() {
+                self._whitelist_total().update(|&mut prev| prev + 1);
+            }
+        }
+
+        Ok(())
+    }
 
     fn _is_whitelisted(&self, address: &ManagedAddress) -> bool {
         self._whitelist().contains(address)
@@ -36,6 +51,12 @@ pub trait Whitelist {
     fn _remove_from_whitelist(&self, address: &ManagedAddress) -> bool {
         self._whitelist().remove(address)
     }
+
+    // fn init_whitelist() -> SCResult<()> {
+    //     for adress in WHITE_LIST.iter() {
+    //         self.add_to_whitelist(address::from_string(adress).unwrap());
+    //     }
+    // }
 
     // storage
     // current whitelisted addresses
