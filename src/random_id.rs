@@ -1,82 +1,59 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
-
-const RESERVED_COUNT: usize = 10; // team
+const RESERVED_COUNT: usize = 10; // 10
 
 #[elrond_wasm::module]
 pub trait RandomId {
     // endpoints
-
-    fn _generate_random_id(&self) -> SCResult<u32> {
-        let remaining_tokens = self._remaining_tokens_ids();
-        require!(remaining_tokens.len() > 0, "No more tokens available");
-
-        let start_index = RESERVED_COUNT + 1;
-        let end_index = remaining_tokens.len() + 1;
-
-        require!(
-            start_index <= end_index + 1,
-            "All public token have been generated"
-        );
-
-        let mut rand = RandomnessSource::<Self::Api>::new();
-        let rand_index = rand.next_usize_in_range(start_index, end_index); // [min, max)
-
-        for (i, uid) in remaining_tokens.iter().enumerate() {
-            if i == rand_index {
-                return Ok(uid);
-            }
-        }
-
-        sc_error!("Error while generating random id")
-
-        // Ok(remaining_tokens
-        //     // .iter()
-        //     .enumerate()
-        //     .filter(|(i, _)| i == &rand_index))
-    }
-
-    /// Set the initial remaining data, will be decremented at each mint
     fn _fill_remaining_tokens(&self, supply: usize) -> SCResult<()> {
-        let mut remaining_tokens_ids = self._remaining_tokens_ids();
-
+        let mut remaining_tokens_ids = self._remaining_tokens_ids().get();
         require!(
             remaining_tokens_ids.is_empty(),
             "remaining_tokens_ids already filled"
         );
-        for i in 1..=supply as u32 {
-            remaining_tokens_ids.insert(i);
+        let start: u32 = RESERVED_COUNT as u32 + 1;
+        remaining_tokens_ids = Vec::new();
+        for i in start..=supply as u32 {
+            remaining_tokens_ids.insert(0, i); // mb use push instead?
         }
-
+        self._remaining_tokens_ids().set(remaining_tokens_ids);
         Ok(())
     }
-    fn _shuffle_remaining_tokens(&self, supply: usize) -> SCResult<()> {
+
+    fn _shuffle_ids(&self) -> SCResult<()> {
+        let mut remaining_tokens_ids = self._remaining_tokens_ids().get();
+        require!(
+            !remaining_tokens_ids.is_empty(),
+            "remaining_tokens_ids is empty"
+        );
         let mut rand_source = RandomnessSource::<Self::Api>::new();
-        let mut remaining_tokens_ids = self._remaining_tokens_ids();
-
-        for i in RESERVED_COUNT..remaining_tokens_ids.len() {
+        for i in 0..((remaining_tokens_ids.len() - 1) / 2) {
             let rand_index = rand_source.next_usize_in_range(i, remaining_tokens_ids.len());
-            let first_item = remaining_tokens_ids.get(i).unwrap();
-            let second_item = remaining_tokens_ids.get(rand_index).unwrap();
-
-            remaining_tokens_ids.set(i, &second_item);
-            remaining_tokens_ids.set(rand_index, &first_item);
+            let v1 = remaining_tokens_ids[rand_index];
+            let v2 = remaining_tokens_ids[i];
+            remaining_tokens_ids[i] = v1;
+            remaining_tokens_ids[rand_index] = v2;
         }
-
+        self._remaining_tokens_ids().set(remaining_tokens_ids);
         Ok(())
     }
-
-    fn _remove_id_from_remaining_list(&self, uid: u32) -> bool {
-        let mut remaining = self._remaining_tokens_ids();
-        remaining.remove(&uid)
+    fn _generate_random_id(&self) -> SCResult<u32> {
+        let mut remaining_tokens_ids = self._remaining_tokens_ids().get();
+        require!(
+            remaining_tokens_ids.len() > 0,
+            "All public token have been generated"
+        );
+        let uid = remaining_tokens_ids[remaining_tokens_ids.len() - 1];
+        remaining_tokens_ids.pop();
+        self._remaining_tokens_ids().set(remaining_tokens_ids);
+        Ok(uid)
     }
-
-    // view
-    #[view(getRemainingCount)]
-    fn get_remaining_count(&self) -> usize {
-        self._remaining_tokens_ids().len()
-    }
-    // storage
     #[storage_mapper("remainingTokens")]
-    fn _remaining_tokens_ids(&self) -> SetMapper<u32>;
+    fn _remaining_tokens_ids(&self) -> SingleValueMapper<Vec<u32>>;
+
+    #[view(getRemainingCount)]
+    fn get_remaining_count(&self) -> SCResult<u32> {
+        let remaining_tokens_ids = self._remaining_tokens_ids().get();
+        Ok(remaining_tokens_ids.len() as u32)
+    }
 }

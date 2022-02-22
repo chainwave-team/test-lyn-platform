@@ -13,12 +13,12 @@ declare -a ADRESSES=(
     "wallet2"
     "wallet3"
     "wallet4"
-    "wallet5"
-    "wallet6"
-    "wallet7"
-    "wallet8"
-    "wallet9"
-    "wallet10"
+    # "wallet5"
+    # "wallet6"
+    # "wallet7"
+    # "wallet8"
+    # "wallet9"
+    # "wallet10"
 )
 
 bulkTx() {

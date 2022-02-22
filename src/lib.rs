@@ -57,6 +57,7 @@ pub trait NftMinter:
         self._json_cid().set(&str_to_buffer(JSON_CID));
         self._image_cid().set(&str_to_buffer(IMAGE_CID));
         self._fill_remaining_tokens(MAX_SUPPLY)?;
+        self._shuffle_ids()?;
         self._public_sale_status().set(false);
         Ok(())
     }
@@ -236,7 +237,8 @@ pub trait NftMinter:
         self._minted_ids().insert(id);
 
         // Decrement available remaining tokens list
-        self._remove_id_from_remaining_list(id);
+        // no longer needed
+        // self._remove_id_from_remaining_list(id);
 
         Ok(nonce as u32)
     }
