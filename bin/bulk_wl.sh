@@ -1,7 +1,7 @@
 declare -a ADRESSES=(
-    # "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
-    # "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"
-    # "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"
+    "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+    "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"
+    "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"
     "erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8"
     "erd18tudnj2z8vjh0339yu3vrkgzz2jpz8mjq0uhgnmklnap6z33qqeszq2yn4"
     "erd1kyaqzaprcdnv4luvanah0gfxzzsnpaygsy6pytrexll2urtd05ts9vegu7"
@@ -15,16 +15,16 @@ declare -a ADRESSES=(
 #!/bin/bash
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgqf5kap4px390vm66j3huh54t3djq79acrjg9qyzgk4t"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgq6etagc8fufs8f85u4x8xt7cv7kklp8xfjg9qa054fd"
 
 OWNER_PEM="wallets/owner/owner.pem"
 
 # DEVNET CONFIG
-PROXY="https://devnet-gateway.elrond.com"
-CHAIN="D"
+# PROXY="https://devnet-gateway.elrond.com"
+# CHAIN="D"
 # # TESTNET CONFIG
-# PROXY="https://testnet-gateway.elrond.com"
-# CHAIN="T"
+PROXY="https://testnet-gateway.elrond.com"
+CHAIN="T"
 # # MAINNET CONFIG
 # PROXY="https://gateway.elrond.com"
 # CHAIN="M"

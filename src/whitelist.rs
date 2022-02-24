@@ -1,7 +1,7 @@
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
-const MAX_WHITELISTED_USERS: usize = 10; // 200
+const MAX_WHITELISTED_USERS: usize = 200; // 200
 
 // When a whitelisted user uses its advantage,
 // then he is remove from the whitelist.

@@ -8,12 +8,15 @@ JSON_CID="0x62616679626569657762667779326333337a7a726e367535377a36796d6e69346a69
 IMAGE_CID="0x626166796265696466796734746b78617a637269683365616f6370776e346d363776796863756f6372756a77706c6536796a6f6c786b746e69716d" # bafybeidfyg4tkxazcrih3eaocpwn4m67vyhcuocrujwple6yjolxktniqm
 TAGS="0x746167312c74616732"                                                                                                          # tag1,tag2
 
-PROXY="https://devnet-gateway.elrond.com"
-CHAIN="D"
-# # TESTNET CONFIG
-# PROXY="https://testnet-gateway.elrond.com"
-# CHAIN="T"
-# # MAINNET CONFIG
+# DEVNET CONFIG
+# PROXY="https://devnet-gateway.elrond.com"
+# CHAIN="D"
+
+# TESTNET CONFIG
+PROXY="https://testnet-gateway.elrond.com"
+CHAIN="T"
+
+# MAINNET CONFIG
 # PROXY="https://gateway.elrond.com"
 # CHAIN="M"
 
@@ -22,7 +25,7 @@ erdpy --verbose \
     --recall-nonce \
     --project="." \
     --pem="wallets/owner/owner.pem" \
-    --gas-limit=200000000 \
+    --gas-limit=600000000 \
     --arguments 1000 ${TAGS} \
     --send \
     --outfile="deploy.interaction.json" \

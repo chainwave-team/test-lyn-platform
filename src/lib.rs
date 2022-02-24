@@ -26,14 +26,14 @@ mod whitelist;
 use crate::utils::{build_attributes, build_name, build_uris, str_to_buffer};
 
 // TODO: WARNING - FAKE DATA TO TEST
-const ON_SALE_SUPPLY: usize = 40; // 2700;
-const MAX_SUPPLY: usize = 50;
+const ON_SALE_SUPPLY: usize = 2800; // 2800;
+const MAX_SUPPLY: usize = 3000; // 3000;
 const MAX_MINT_COUNT_BY_ADDRESS: usize = 5;
 const ONE_EGLD: u64 = 1_000_000_000_000_000_000;
 
 // TODO: Pass it as function args (in init ideally)
-const IMAGE_CID: &str = "bafybeidfyg4tkxazcrih3eaocpwn4m67vyhcuocrujwple6yjolxktniqm";
-const JSON_CID: &str = "bafybeiewbfwy2c33zzrn6u57z6ymni4jixdscryj7jovyuiknsklfqb4n4";
+const IMAGE_CID: &str = "bafybeiecb3p6mydrb3br4a3fipxzca7tcwvp4ilqlqmjuri4hkfzpuqe3u";
+const JSON_CID: &str = "bafybeibfcxtinf2vnwaq6a5brqqftrhb74w4fcuc7uutwf36h5v5banyma";
 
 #[elrond_wasm::contract]
 pub trait NftMinter:
@@ -170,7 +170,7 @@ pub trait NftMinter:
 
     #[view(getMintPrice)]
     fn get_mint_price(&self, caller: &ManagedAddress) -> BigUint {
-        const CENT: u64 = ONE_EGLD / 10;
+        const CENT: u64 = ONE_EGLD / 100;
         let is_whitelisted = self._is_whitelisted(&caller);
 
         /*
@@ -179,29 +179,17 @@ pub trait NftMinter:
         */
         if is_whitelisted {
             self._remove_from_whitelist(&caller);
-            return BigUint::from(CENT); // 0.1 EGLD
+            return BigUint::from(10 * CENT); // 0.1 EGLD
         }
 
-        // TODO: Tmp code for devnet tests
         let already_sold = self._sold_minted_ids().len() as usize;
         let mint_price = match already_sold {
-            // range from 1 to 40
-            0..=10 => 1 * CENT, // the next 200 are at 0,1 egld
-            0..=20 => 2 * CENT, // the next 500 are at 0,2 egld
-            0..=30 => 3 * CENT, // the next 500 are at 0,25 egld
-            _ => 4 * CENT,      // the last 500 are at 0,4 egld
+            0..=800 => 20 * CENT,  // 1
+            0..=1300 => 25 * CENT, // 2
+            0..=1800 => 30 * CENT, // 3
+            0..=2300 => 35 * CENT, //4
+            _ => 40 * CENT,        //5
         };
-
-        // let mint_price = match self.sold_minted_ids().len() {
-        //     // range from 1 to 2700
-        //     supply if supply < 200 => 10 * CENT, // the next 200 are at 0,1 egld
-        //     supply if supply < 700 => 20 * CENT, // the next 500 are at 0,2 egld
-        //     supply if supply < 1200 => 25 * CENT, // the next 500 are at 0,25 egld
-        //     supply if supply < 1700 => 30 * CENT, // the next 500 are at 0,3 egld
-        //     supply if supply < 2200 => 35 * CENT, // the next 500 are at 0,35 egld
-        //     _ => 40 * CENT,                      // the last 500 are at 0,4 egld
-        // };
-
         BigUint::from(mint_price)
     }
 
@@ -235,10 +223,6 @@ pub trait NftMinter:
 
         // Increment total mint count
         self._minted_ids().insert(id);
-
-        // Decrement available remaining tokens list
-        // no longer needed
-        // self._remove_id_from_remaining_list(id);
 
         Ok(nonce as u32)
     }
