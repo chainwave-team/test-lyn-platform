@@ -5,14 +5,14 @@
 # + add 0x before
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgq6etagc8fufs8f85u4x8xt7cv7kklp8xfjg9qa054fd"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgqwel4x3hwthdjhq924r8983wv8e9yyclljg9qfgscw9"
 # DEVNET CONFIG
-# PROXY="https://devnet-gateway.elrond.com"
-# CHAIN="D"
+PROXY="https://devnet-gateway.elrond.com"
+CHAIN="D"
 
 # # TESTNET CONFIG
-PROXY="https://testnet-gateway.elrond.com"
-CHAIN="T"
+# PROXY="https://testnet-gateway.elrond.com"
+# CHAIN="T"
 
 # # MAINNET CONFIG
 # PROXY="https://gateway.elrond.com"

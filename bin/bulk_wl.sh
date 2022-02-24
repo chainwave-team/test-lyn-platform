@@ -15,16 +15,16 @@ declare -a ADRESSES=(
 #!/bin/bash
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgq6etagc8fufs8f85u4x8xt7cv7kklp8xfjg9qa054fd"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgq68t8grpqeh0mtklxqspsvxvph3jppn5vjg9qgpvq9r"
 
 OWNER_PEM="wallets/owner/owner.pem"
 
 # DEVNET CONFIG
-# PROXY="https://devnet-gateway.elrond.com"
-# CHAIN="D"
+PROXY="https://devnet-gateway.elrond.com"
+CHAIN="D"
 # # TESTNET CONFIG
-PROXY="https://testnet-gateway.elrond.com"
-CHAIN="T"
+# PROXY="https://testnet-gateway.elrond.com"
+# CHAIN="T"
 # # MAINNET CONFIG
 # PROXY="https://gateway.elrond.com"
 # CHAIN="M"
@@ -35,7 +35,6 @@ wl() {
         hex=$(erdpy wallet bech32 --decode $adress)
         PAYLOAD+=$hex
     done
-    echo $PAYLOAD
     erdpy --verbose contract call ${SC_ADDRESS} \
         --recall-nonce \
         --pem=${OWNER_PEM} \

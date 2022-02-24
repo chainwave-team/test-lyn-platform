@@ -1,18 +1,18 @@
 #!/bin/bash
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgq6etagc8fufs8f85u4x8xt7cv7kklp8xfjg9qa054fd"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgqsuvupg8rz7jzfe94v22pw90nghh3swu9jg9q45n7xv"
 
-HEIDI_ADDRESS_BECH32="erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"
+HEIDI_ADDRESS_BECH32="erd1gtfpvarn60xe25vy64m97zjkq30rlvgf3ee4g0h74clsmclehksqhay0tm"
 HEIDI_ADDRESS_HEX=0x$(erdpy wallet bech32 --decode ${HEIDI_ADDRESS_BECH32})
 
 OWNER_PEM="wallets/owner/owner.pem"
 
-# PROXY="https://devnet-gateway.elrond.com"
-# CHAIN="D"
+PROXY="https://devnet-gateway.elrond.com"
+CHAIN="D"
 # # TESTNET CONFIG
-PROXY="https://testnet-gateway.elrond.com"
-CHAIN="T"
+# PROXY="https://testnet-gateway.elrond.com"
+# CHAIN="T"
 # # MAINNET CONFIG
 # PROXY="https://gateway.elrond.com"
 # CHAIN="M"
@@ -20,7 +20,7 @@ CHAIN="T"
 GAS_LIMIT=600000000
 
 give() {
-    [[ $1 == "giveaway" ]] && GAS_LIMIT=35000000
+    [[ $1 == "giveaway" ]] && GAS_LIMIT=600000000
     erdpy --verbose contract call ${SC_ADDRESS} \
         --recall-nonce \
         --pem=${OWNER_PEM} \
@@ -35,6 +35,6 @@ give() {
 # Run
 # ---
 
-give giveaway 10
-# give giveawayMany 5
+give giveaway 174
+# give giveawayMany 20
 # give giveaway

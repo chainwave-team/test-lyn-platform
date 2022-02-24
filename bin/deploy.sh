@@ -9,12 +9,12 @@ IMAGE_CID="0x626166796265696466796734746b78617a637269683365616f6370776e346d36377
 TAGS="0x746167312c74616732"                                                                                                          # tag1,tag2
 
 # DEVNET CONFIG
-# PROXY="https://devnet-gateway.elrond.com"
-# CHAIN="D"
+PROXY="https://devnet-gateway.elrond.com"
+CHAIN="D"
 
 # TESTNET CONFIG
-PROXY="https://testnet-gateway.elrond.com"
-CHAIN="T"
+# PROXY="https://testnet-gateway.elrond.com"
+# CHAIN="T"
 
 # MAINNET CONFIG
 # PROXY="https://gateway.elrond.com"

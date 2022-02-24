@@ -57,7 +57,6 @@ pub trait NftMinter:
         self._json_cid().set(&str_to_buffer(JSON_CID));
         self._image_cid().set(&str_to_buffer(IMAGE_CID));
         self._fill_remaining_tokens(MAX_SUPPLY)?;
-        self._shuffle_ids()?;
         self._public_sale_status().set(false);
         Ok(())
     }
@@ -72,9 +71,10 @@ pub trait NftMinter:
         receiver: &ManagedAddress,
         #[var_args] id: OptionalArg<u32>,
     ) -> SCResult<()> {
+        let sold_minted_count = self.get_minted_count();
         let next_id: u32 = match id {
             OptionalArg::Some(index) => index,
-            OptionalArg::None => self._generate_random_id()?,
+            OptionalArg::None => self._generate_random_id(sold_minted_count)?,
         };
 
         // Mint
@@ -90,6 +90,7 @@ pub trait NftMinter:
         );
         Ok(())
     }
+
     /// Run multiple time "giveaway" methods to send many tokens
     #[only_owner]
     #[endpoint(giveawayMany)]
@@ -107,7 +108,7 @@ pub trait NftMinter:
     #[endpoint(mint)]
     fn mint(&self, #[payment_amount] payment_amount: BigUint) -> SCResult<()> {
         // if there are still tokens to sell
-        let sold_minted_count = self.get_sold_count();
+        let sold_minted_count = self.get_minted_count();
         require!(
             sold_minted_count < ON_SALE_SUPPLY,
             "All on sale token have been minted"
@@ -132,7 +133,7 @@ pub trait NftMinter:
         require!(payment_amount == price, "Invalid amount as payment");
 
         // Mint
-        let id = self._generate_random_id()?;
+        let id = self._generate_random_id(sold_minted_count)?;
         let nft_nonce = self._mint(id)?;
 
         // Pay the mint cost
@@ -158,7 +159,7 @@ pub trait NftMinter:
             .set(caller_mint_count + 1);
 
         // increment sold mint count
-        self._sold_minted_ids().insert(id);
+        self._minted_ids().insert(id);
 
         Ok(())
     }
@@ -182,7 +183,7 @@ pub trait NftMinter:
             return BigUint::from(10 * CENT); // 0.1 EGLD
         }
 
-        let already_sold = self._sold_minted_ids().len() as usize;
+        let already_sold = self._minted_ids().len() as usize;
         let mint_price = match already_sold {
             0..=800 => 20 * CENT,  // 1
             0..=1300 => 25 * CENT, // 2
@@ -195,12 +196,11 @@ pub trait NftMinter:
 
     #[view(getMintedCount)]
     fn get_minted_count(&self) -> usize {
+        // need refactor ? 
+        if (self._minted_ids().is_empty()) {
+            return 0;
+        }
         self._minted_ids().len()
-    }
-
-    #[view(getSoldCount)]
-    fn get_sold_count(&self) -> usize {
-        self._sold_minted_ids().len()
     }
 
     // private
@@ -260,9 +260,6 @@ pub trait NftMinter:
     }
 
     // storage
-
-    #[storage_mapper("soldMintedIds")]
-    fn _sold_minted_ids(&self) -> SetMapper<u32>;
 
     #[storage_mapper("mintCountByAddress")]
     fn _sold_count_by_address(&self, address: &ManagedAddress) -> SingleValueMapper<usize>;

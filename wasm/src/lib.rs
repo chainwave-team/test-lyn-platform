@@ -11,7 +11,6 @@ elrond_wasm_node::wasm_endpoints! {
         getMintPrice
         getMintedCount
         getRemainingCount
-        getSoldCount
         getTokenId
         getTokenName
         giveaway
