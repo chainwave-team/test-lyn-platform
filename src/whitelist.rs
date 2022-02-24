@@ -15,10 +15,8 @@ pub trait Whitelist {
     fn add_to_whitelist(&self, address: ManagedAddress) -> SCResult<()> {
         let total: usize = self._whitelist_total().get();
         require!(total <= MAX_WHITELISTED_USERS, "The whitelist is full");
-
         // add to the whitelist
         self._whitelist().insert(address);
-
         // increment total count
         if self._whitelist_total().is_empty() {
             self._whitelist_total().set(1);
@@ -51,12 +49,6 @@ pub trait Whitelist {
     fn _remove_from_whitelist(&self, address: &ManagedAddress) -> bool {
         self._whitelist().remove(address)
     }
-
-    // fn init_whitelist() -> SCResult<()> {
-    //     for adress in WHITE_LIST.iter() {
-    //         self.add_to_whitelist(address::from_string(adress).unwrap());
-    //     }
-    // }
 
     // storage
     // current whitelisted addresses
