@@ -5,13 +5,13 @@
 # + add 0x before
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgqwel4x3hwthdjhq924r8983wv8e9yyclljg9qfgscw9"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgqz7e5xcwetd48t5qww22av9fpn8jk8xr5jg9qvlavym"
 
 # -- MINT TYPE --
 # Uncomment for a single mint
-HEIDI_PEM="wallets/users/carol.pem"
+# HEIDI_PEM="wallets/users/carol.pem"
 # #Uncomment for bulk mint
-# HEIDI_PEM="wallets/users/$1.pem"
+HEIDI_PEM="wallets/users/$1.pem"
 
 # -- Chain config --
 # DEVNET CONFIG
@@ -31,7 +31,7 @@ erdpy --verbose \
     --recall-nonce \
     --pem=${HEIDI_PEM} \
     --gas-limit=60000000 \
-    --value=200000000000000000 \
+    --value=250000000000000000 \
     --function="mint" \
     --send \
     --proxy=${PROXY} \

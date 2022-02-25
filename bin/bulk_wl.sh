@@ -15,7 +15,7 @@ declare -a ADRESSES=(
 #!/bin/bash
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgq68t8grpqeh0mtklxqspsvxvph3jppn5vjg9qgpvq9r"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgqgfh4hz5j7009296my0tvhcf66htlvyp0jg9q49p8y3"
 
 OWNER_PEM="wallets/owner/owner.pem"
 

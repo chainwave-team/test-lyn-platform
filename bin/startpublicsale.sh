@@ -5,7 +5,7 @@
 # + add 0x before
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgqwel4x3hwthdjhq924r8983wv8e9yyclljg9qfgscw9"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgqz7e5xcwetd48t5qww22av9fpn8jk8xr5jg9qvlavym"
 # DEVNET CONFIG
 PROXY="https://devnet-gateway.elrond.com"
 CHAIN="D"

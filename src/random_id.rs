@@ -27,9 +27,11 @@ pub trait RandomId {
     }
 
     fn _generate_random_id(&self, _sold: usize) -> SCResult<u32> {
-        // Handle _sold = 0 case
-        // needs tests for this
-        Ok(self._remaining_tokens_ids().get(RESERVED_COUNT + 1 + _sold))
+        require!(
+            !self._remaining_tokens_ids().is_empty(),
+            "remaining_tokens_ids is empty"
+        );
+        Ok(self._remaining_tokens_ids().get(_sold + 1))
     }
 
     #[storage_mapper("remainingTokens")]

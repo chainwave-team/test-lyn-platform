@@ -5,7 +5,7 @@
 # + add 0x before
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgqsuvupg8rz7jzfe94v22pw90nghh3swu9jg9q45n7xv"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgqz7e5xcwetd48t5qww22av9fpn8jk8xr5jg9qvlavym"
 
 TOKEN_TICK="0x424142414e45" # AXONE
 TOKEN_NAME="0x41414145"     # AXNE

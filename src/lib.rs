@@ -26,8 +26,8 @@ mod whitelist;
 use crate::utils::{build_attributes, build_name, build_uris, str_to_buffer};
 
 // TODO: WARNING - FAKE DATA TO TEST
-const ON_SALE_SUPPLY: usize = 2800; // 2800;
-const MAX_SUPPLY: usize = 3000; // 3000;
+const ON_SALE_SUPPLY: usize = 40; // 2800;
+const MAX_SUPPLY: usize = 50; // 3000;
 const MAX_MINT_COUNT_BY_ADDRESS: usize = 5;
 const ONE_EGLD: u64 = 1_000_000_000_000_000_000;
 
@@ -58,6 +58,7 @@ pub trait NftMinter:
         self._image_cid().set(&str_to_buffer(IMAGE_CID));
         self._fill_remaining_tokens(MAX_SUPPLY)?;
         self._public_sale_status().set(false);
+        self.count_minted_ids().set(0);
         Ok(())
     }
 
@@ -71,7 +72,7 @@ pub trait NftMinter:
         receiver: &ManagedAddress,
         #[var_args] id: OptionalArg<u32>,
     ) -> SCResult<()> {
-        let sold_minted_count = self.get_minted_count();
+        let sold_minted_count = self.count_minted_ids().get();
         let next_id: u32 = match id {
             OptionalArg::Some(index) => index,
             OptionalArg::None => self._generate_random_id(sold_minted_count)?,
@@ -108,7 +109,7 @@ pub trait NftMinter:
     #[endpoint(mint)]
     fn mint(&self, #[payment_amount] payment_amount: BigUint) -> SCResult<()> {
         // if there are still tokens to sell
-        let sold_minted_count = self.get_minted_count();
+        let sold_minted_count = self.count_minted_ids().get();
         require!(
             sold_minted_count < ON_SALE_SUPPLY,
             "All on sale token have been minted"
@@ -160,6 +161,7 @@ pub trait NftMinter:
 
         // increment sold mint count
         self._minted_ids().insert(id);
+        self.count_minted_ids().set(sold_minted_count + 1);
 
         Ok(())
     }
@@ -168,7 +170,6 @@ pub trait NftMinter:
 
     /// This function return the current mint price based on how many have been mined.
     /// The get_mint_price works on the 2700 on sale nfts, don't use it for giveaway, it makes sense.
-
     #[view(getMintPrice)]
     fn get_mint_price(&self, caller: &ManagedAddress) -> BigUint {
         const CENT: u64 = ONE_EGLD / 100;
@@ -183,24 +184,19 @@ pub trait NftMinter:
             return BigUint::from(10 * CENT); // 0.1 EGLD
         }
 
-        let already_sold = self._minted_ids().len() as usize;
+        let already_sold = self.count_minted_ids().get();
         let mint_price = match already_sold {
-            0..=800 => 20 * CENT,  // 1
-            0..=1300 => 25 * CENT, // 2
-            0..=1800 => 30 * CENT, // 3
-            0..=2300 => 35 * CENT, //4
-            _ => 40 * CENT,        //5
+            0..=10 => 20 * CENT, // 1
+            0..=20 => 25 * CENT, // 2
+            0..=30 => 30 * CENT, // 3
+            _ => 40 * CENT,      //5
+                                  // 0..=800 => 20 * CENT,  // 1
+                                  // 0..=1300 => 25 * CENT, // 2
+                                  // 0..=1800 => 30 * CENT, // 3
+                                  // 0..=2300 => 35 * CENT, //4
+                                  // _ => 40 * CENT,        //5
         };
         BigUint::from(mint_price)
-    }
-
-    #[view(getMintedCount)]
-    fn get_minted_count(&self) -> usize {
-        // need refactor ? 
-        if (self._minted_ids().is_empty()) {
-            return 0;
-        }
-        self._minted_ids().len()
     }
 
     // private
@@ -222,7 +218,9 @@ pub trait NftMinter:
         let nonce = self._create_nft(id)?;
 
         // Increment total mint count
+        let sold_minted_count = self.count_minted_ids().get();
         self._minted_ids().insert(id);
+        self.count_minted_ids().set(sold_minted_count + 1);
 
         Ok(nonce as u32)
     }
@@ -275,4 +273,8 @@ pub trait NftMinter:
 
     #[storage_mapper("mintedIds")]
     fn _minted_ids(&self) -> SetMapper<u32>;
+
+    #[view(getMintedCount)]
+    #[storage_mapper("mintedIdsCounter")]
+    fn count_minted_ids(&self) -> SingleValueMapper<usize>;
 }

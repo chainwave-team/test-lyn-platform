@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgqsuvupg8rz7jzfe94v22pw90nghh3swu9jg9q45n7xv"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgqz7e5xcwetd48t5qww22av9fpn8jk8xr5jg9qvlavym"
 
 HEIDI_ADDRESS_BECH32="erd1gtfpvarn60xe25vy64m97zjkq30rlvgf3ee4g0h74clsmclehksqhay0tm"
 HEIDI_ADDRESS_HEX=0x$(erdpy wallet bech32 --decode ${HEIDI_ADDRESS_BECH32})
@@ -35,6 +35,6 @@ give() {
 # Run
 # ---
 
-give giveaway 174
-# give giveawayMany 20
+# give giveaway 174
+give giveawayMany 9
 # give giveaway
