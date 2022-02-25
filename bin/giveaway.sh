@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgqz7e5xcwetd48t5qww22av9fpn8jk8xr5jg9qvlavym"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgqa2nz4zk8h8d2k7ynrvg6hhl2h40txsj2jg9qqsdnwr"
 
-HEIDI_ADDRESS_BECH32="erd1gtfpvarn60xe25vy64m97zjkq30rlvgf3ee4g0h74clsmclehksqhay0tm"
+HEIDI_ADDRESS_BECH32="erd17vjys99nvm6swpymygauwlwn4xdxc6nccw42j7qev5h774athylqt720j5"
 HEIDI_ADDRESS_HEX=0x$(erdpy wallet bech32 --decode ${HEIDI_ADDRESS_BECH32})
 
 OWNER_PEM="wallets/owner/owner.pem"
@@ -20,7 +20,7 @@ CHAIN="D"
 GAS_LIMIT=600000000
 
 give() {
-    [[ $1 == "giveaway" ]] && GAS_LIMIT=600000000
+    [[ $1 == "giveaway" ]] && GAS_LIMIT=11000000
     erdpy --verbose contract call ${SC_ADDRESS} \
         --recall-nonce \
         --pem=${OWNER_PEM} \
@@ -36,5 +36,5 @@ give() {
 # ---
 
 # # give giveaway 174
-# give giveawayMany 9
-give giveaway 10
+give giveawayMany 48
+# give giveaway 

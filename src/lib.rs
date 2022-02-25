@@ -10,9 +10,6 @@
 // Be careful, there is some config available in the CreateNFT mod.
 
 extern crate alloc;
-
-// use alloc::{string::String, vec::Vec};
-
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
 
@@ -26,8 +23,8 @@ mod whitelist;
 use crate::utils::{build_attributes, build_name, build_uris, str_to_buffer};
 
 // TODO: WARNING - FAKE DATA TO TEST
-const ON_SALE_SUPPLY: usize = 40; // 2800;
-const MAX_SUPPLY: usize = 50; // 3000;
+const ON_SALE_SUPPLY: usize = 2800;
+const MAX_SUPPLY: usize = 3000;
 const MAX_MINT_COUNT_BY_ADDRESS: usize = 5;
 const ONE_EGLD: u64 = 1_000_000_000_000_000_000;
 
@@ -186,15 +183,11 @@ pub trait NftMinter:
 
         let already_sold = self.count_minted_ids().get();
         let mint_price = match already_sold {
-            0..=10 => 20 * CENT, // 1
-            0..=20 => 25 * CENT, // 2
-            0..=30 => 30 * CENT, // 3
-            _ => 40 * CENT,      //5
-                                  // 0..=800 => 20 * CENT,  // 1
-                                  // 0..=1300 => 25 * CENT, // 2
-                                  // 0..=1800 => 30 * CENT, // 3
-                                  // 0..=2300 => 35 * CENT, //4
-                                  // _ => 40 * CENT,        //5
+            0..=800 => 20 * CENT,  // 1
+            0..=1300 => 25 * CENT, // 2
+            0..=1800 => 30 * CENT, // 3
+            0..=2300 => 35 * CENT, //4
+            _ => 40 * CENT,        //5
         };
         BigUint::from(mint_price)
     }

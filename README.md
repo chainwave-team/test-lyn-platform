@@ -72,16 +72,15 @@ chmod +x ./bin/generate_api.sh
 
 - `getMintPrice()`
 - `getMintedCount()`
-- `getSoldCount()`
 
 ### Storage
 
-- `soldMintedIds`
 - `mintCountByAddress`
 - `jsonCid`
 - `imageCid`
 - `tags`
 - `mintedIds`
+- `mintedIdsCounter`
 
 ## Supply distribution and mint process
 

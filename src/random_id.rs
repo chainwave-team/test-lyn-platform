@@ -7,7 +7,7 @@ pub trait RandomId {
     // endpoints
     fn _fill_remaining_tokens(&self, supply: usize) -> SCResult<()> {
         require!(
-            self._remaining_tokens_ids().is_empty(),
+            self.token_ids_shuffled().is_empty(),
             "remaining_tokens_ids already filled"
         );
         let start: usize = RESERVED_COUNT + 1;
@@ -21,24 +21,16 @@ pub trait RandomId {
                 tokens_vec.swap(rand_index, 0);
             }
         }
-        self._remaining_tokens_ids()
+        self.token_ids_shuffled()
             .extend_from_slice(&tokens_vec.as_slice());
         Ok(())
     }
 
     fn _generate_random_id(&self, _sold: usize) -> SCResult<u32> {
-        require!(
-            !self._remaining_tokens_ids().is_empty(),
-            "remaining_tokens_ids is empty"
-        );
-        Ok(self._remaining_tokens_ids().get(_sold + 1))
+        // get index starts at 1 
+        Ok(self.token_ids_shuffled().get(_sold + 1))
     }
 
     #[storage_mapper("remainingTokens")]
-    fn _remaining_tokens_ids(&self) -> VecMapper<u32>;
-
-    #[view(getRemainingCount)]
-    fn get_remaining_count(&self) -> SCResult<u32> {
-        Ok(self._remaining_tokens_ids().len() as u32)
-    }
+    fn token_ids_shuffled(&self) -> VecMapper<u32>;
 }
