@@ -1,21 +1,21 @@
 #!/bin/bash
 
 # update me each time you have re-deployed
-SC_ADDRESS="erd1qqqqqqqqqqqqqpgqa2nz4zk8h8d2k7ynrvg6hhl2h40txsj2jg9qqsdnwr"
+SC_ADDRESS="erd1qqqqqqqqqqqqqpgqas9uuf68zhdmrmf3894vpfmt8dxw9rkt2yyqp4d8kt"
 
-HEIDI_ADDRESS_BECH32="erd17vjys99nvm6swpymygauwlwn4xdxc6nccw42j7qev5h774athylqt720j5"
+HEIDI_ADDRESS_BECH32="erd1sh28vv8v4tvtqp8n7878hp43v73ka8pmzd7zcgrhdzp6ktgqj79q5ufrys"
 HEIDI_ADDRESS_HEX=0x$(erdpy wallet bech32 --decode ${HEIDI_ADDRESS_BECH32})
 
-OWNER_PEM="wallets/owner/owner.pem"
+OWNER_PEM="wallets/owner/neodium.pem"
 
-PROXY="https://devnet-gateway.elrond.com"
-CHAIN="D"
+# PROXY="https://devnet-gateway.elrond.com"
+# CHAIN="D"
 # # TESTNET CONFIG
 # PROXY="https://testnet-gateway.elrond.com"
 # CHAIN="T"
 # # MAINNET CONFIG
-# PROXY="https://gateway.elrond.com"
-# CHAIN="M"
+PROXY="https://gateway.elrond.com"
+CHAIN="1"
 
 GAS_LIMIT=600000000
 
@@ -35,6 +35,6 @@ give() {
 # Run
 # ---
 
-# # give giveaway 174
-give giveawayMany 48
+# give giveaway 5
+# give giveawayMany 50
 # give giveaway 

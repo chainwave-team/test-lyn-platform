@@ -6,3 +6,6 @@
 # The erdpy output
 output
 deploy-devnet.interaction.json
+deplot.interaction.json
+/wallets/owner/
+.DS_Store

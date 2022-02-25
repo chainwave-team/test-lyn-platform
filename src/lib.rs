@@ -53,9 +53,13 @@ pub trait NftMinter:
         self._tags().set(&tags);
         self._json_cid().set(&str_to_buffer(JSON_CID));
         self._image_cid().set(&str_to_buffer(IMAGE_CID));
-        self._fill_remaining_tokens(MAX_SUPPLY)?;
         self._public_sale_status().set(false);
-        self.count_minted_ids().set(0);
+        // if upgrade is needed,
+        if (self.count_minted_ids().is_empty()) {
+            self._fill_remaining_tokens(MAX_SUPPLY)?;
+            self.count_minted_ids().set(0);
+        }
+
         Ok(())
     }
 

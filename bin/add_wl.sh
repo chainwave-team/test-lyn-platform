@@ -9,14 +9,14 @@ HEIDI_ADDRESS_HEX=0x$(erdpy wallet bech32 --decode ${HEIDI_ADDRESS_BECH32})
 OWNER_PEM="wallets/owner/owner.pem"
 
 # DEVNET CONFIG
-PROXY="https://devnet-gateway.elrond.com"
-CHAIN="D"
+# PROXY="https://devnet-gateway.elrond.com"
+# CHAIN="D"
 # # TESTNET CONFIG
 # PROXY="https://testnet-gateway.elrond.com"
 # CHAIN="T"
 # # MAINNET CONFIG
-# PROXY="https://gateway.elrond.com"
-# CHAIN="M"
+PROXY="https://gateway.elrond.com"
+CHAIN="M"
 
 wl() {
     echo $1 ${HEIDI_ADDRESS_HEX}
