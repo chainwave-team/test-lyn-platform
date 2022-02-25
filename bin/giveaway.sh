@@ -35,6 +35,6 @@ give() {
 # Run
 # ---
 
-# give giveaway 174
-give giveawayMany 9
-# give giveaway
+# # give giveaway 174
+# give giveawayMany 9
+give giveaway 10

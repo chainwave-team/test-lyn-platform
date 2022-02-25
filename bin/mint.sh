@@ -31,7 +31,7 @@ erdpy --verbose \
     --recall-nonce \
     --pem=${HEIDI_PEM} \
     --gas-limit=60000000 \
-    --value=250000000000000000 \
+    --value=400000000000000000 \
     --function="mint" \
     --send \
     --proxy=${PROXY} \
